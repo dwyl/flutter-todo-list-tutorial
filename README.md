@@ -39,3 +39,32 @@ child: Icon(Icons.add),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
 ```
+6-Inside the body add a Column to store the day of the week.
+
+```ruby
+ child: Text(
+            "Monday",
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          ),
+
+```
+7- Create a "CustomButton" to get the tasks and another one for the events.
+
+```ruby
+child: CustomButton(
+              onPressed: () {
+                _pageController.previousPage(
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.bounceInOut);
+              },
+              buttonText: "Tasks",
+              color:
+              currentPage < 0.5 ? Theme.of(context).accentColor : Colors.white,
+              textColor:
+              currentPage < 0.5 ? Colors.white : Theme.of(context).accentColor,
+              borderColor: currentPage < 0.5
+                  ? Colors.transparent
+                  : Theme.of(context).accentColor,
+            )),
+
+```
