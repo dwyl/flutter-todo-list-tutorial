@@ -4,6 +4,8 @@
 
 This Tutorial will show you process of building of a todo-list with Flutter.
 
+</div>
+
 ## Why?
 
 This application aims to test knowledge acquired with Flutter through an example of an application that can be used in real life (day-to-day).
