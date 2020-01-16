@@ -52,13 +52,22 @@ Everyone looking to learn more about Flutter should be able to perform this appl
 If you get stuck in one step the best thing to do is to open an issue because besides us being able to answer quickly , other people who have the same doubt can be helped.<br />
 If you need to open an issue here is the link to open that issue: https://github.com/dwyl/flutter-todo-list-tutorial/issues
 
+## MOOR
+
+Moor is an easy to use, reactive persistence library for Flutter apps. Define your database tables in pure Dart and enjoy a fluent query API, auto-updating streams and more!
+
 ## _How?_
+
 
  1-Create a new Flutter Project.
 
-![3fSwulrV0S](https://user-images.githubusercontent.com/27420533/72349907-5037f580-36d5-11ea-8bc8-3f2ec65a28be.png)
+![image](https://user-images.githubusercontent.com/27420533/72510378-3f0bf780-3841-11ea-840d-6d56f8663357.png)
+
 
 2-Delete all the "main.dart" comments that are generated after creating a new project.
+
+
+### Design
 
 3- Create a new "bottomNavigationBar" and inside that "bottomNavigationBar" create a "Row" to save the buttons to add new tasks/events and the settings button.
 
@@ -115,3 +124,90 @@ child: CustomButton(
             )),
 
 ```
+
+8- Inside that "Row" you will have a children.Then it is necessary to add two "IconButton".
+
+
+```ruby
+child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: Icon(Icons.more_vert),
+              onPressed: () {},
+            )
+```
+9- To add the Shape of the footer before Row, it is necessary to add the "shape" function and look for "CircularNotchedRectangle".
+
+
+```ruby
+ bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: Row(
+```
+
+This will be the final result of our bar.
+
+![Screen Shot 2020-01-16 at 09 44 31](https://user-images.githubusercontent.com/27420533/72513312-dc1c5f80-3844-11ea-9766-b280988969c1.png)
+
+
+
+10- To write the Application Name we go to the _MainContent class and inside the return Scaffold we add a SizedBox, a child and then we add a Text with what we want to write.
+
+```ruby
+ SizedBox(height: 60),
+        Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Text(
+            "Todo List ",
+```
+
+11- Now we have to create the buttons one for the tasks and one for the events.
+For that right after the Text we open another Row.<br />
+
+Inside this Row we will have a child then we add a "MaterialButton" with a child who takes a Text with the text that appears on the button.
+
+
+
+```ruby
+return Row(                                               
+  children: <Widget>[                                     
+    Expanded(                                             
+        child: CustomButton(                              
+          onPressed: () {                                 
+            _pageController.previousPage(                 
+                duration: Duration(milliseconds: 500),    
+                curve: Curves.bounceInOut);               
+          },                                              
+          buttonText: "Tasks",                            
+                                         
+```
+This will be the final layout of the two buttons and our title. 
+
+
+![Screen Shot 2020-01-16 at 11 45 50](https://user-images.githubusercontent.com/27420533/72522520-d24f2800-3855-11ea-830e-2155907ed51f.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
