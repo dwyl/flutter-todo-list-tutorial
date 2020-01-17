@@ -191,6 +191,11 @@ This will be the final layout of the two buttons and our title.
 
 ![Screen Shot 2020-01-16 at 11 45 50](https://user-images.githubusercontent.com/27420533/72522520-d24f2800-3855-11ea-830e-2155907ed51f.png)
 
+12- To create the tasks we must use Radio Buttons that will be placed under the name of the application.
+It will take the function "radio_button_unchecked".
+Tasks can be added through "_taskUncomplete".
+
+
 
 
 
