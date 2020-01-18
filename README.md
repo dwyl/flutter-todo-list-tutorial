@@ -191,28 +191,205 @@ This will be the final layout of the two buttons and our title.
 
 ![Screen Shot 2020-01-16 at 11 45 50](https://user-images.githubusercontent.com/27420533/72522520-d24f2800-3855-11ea-830e-2155907ed51f.png)
 
-12- To create the tasks we must use Radio Buttons that will be placed under the name of the application.
-It will take the function "radio_button_unchecked".
+12- To create the tasks we must use Radio Buttons that will be placed under the name of the application.<br />
+It will take the function "radio_button_unchecked".<br />
 Tasks can be added through "_taskUncomplete".
 
+13- Create two new widgets one for tasks already done and one for tasks that have not yet been done.<br />
+
+The two will take radio buttons and the one for the tasks already done takes checked radio buttons and the one for the tasks not yet done takes unchecked radio buttons.
+
+![Screen Shot 2020-01-18 at 11 44 40](https://user-images.githubusercontent.com/27420533/72663220-fd698100-39e7-11ea-884a-fca5b13e78da.png)
+
+
+![Screen Shot 2020-01-18 at 11 43 56](https://user-images.githubusercontent.com/27420533/72663223-0d816080-39e8-11ea-9c8f-9c1a4666c5d2.png)
+
+
+## Task/Event Page
+
+1- First hide the debug banner.
+
+
+```ruby
+child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',                           
+                                         
+```
+2- Now we'll have to create another package that will contain the events and tasks page separately.
+
+![Screen Shot 2020-01-18 at 10 49 58](https://user-images.githubusercontent.com/27420533/72662537-5d5c2980-39e0-11ea-84cd-1a54bdd15b53.png)
+
+### How to Create/Add new Package inside src folder
+
+1- Open Android Studio and Navigate to any view(Android or Project)<br />
+2- In Android View you will have two folders: app and Gradle Scripts<br />
+3- Open App folder then open Java folder. Right click on Java folder and select New > Package.<br />
+
+![newpackage](https://user-images.githubusercontent.com/27420533/72662715-546c5780-39e2-11ea-8eff-6118fcd0c339.jpeg)
+
+
+4- Choose directory destination which main\java and click OK.
+
+![Screen Shot 2020-01-18 at 11 07 54](https://user-images.githubusercontent.com/27420533/72662780-2fc4af80-39e3-11ea-8ac0-043ca3e7be6b.png)
+
+
+5- Give a name to new Package(For example: pages). Click Ok.
+
+![Screen Shot 2020-01-18 at 11 13 59](https://user-images.githubusercontent.com/27420533/72662829-b5e0f600-39e3-11ea-9f27-95c2d9d4acfe.png)
+ 
+3- After creating the new package. Right click on the package and Select New > Dart File.<br />
+Name the New Dart File > task_page.dart.<br />
+
+4- Create another one called event_page.dart.<br />
+
+5- Inside the taks_page.dart create a new StatefulWidget, and import your material.dart.<br />
+
+![Screen Shot 2020-01-18 at 11 32 31](https://user-images.githubusercontent.com/27420533/72663097-589a7400-39e6-11ea-84bf-b6c4711ec0b3.png)
+
+![Screen Shot 2020-01-18 at 11 32 14](https://user-images.githubusercontent.com/27420533/72663101-66e89000-39e6-11ea-9f3c-57e2d7444c92.png)
+
+6- Move all the related task code to task widget.
+
+7- Display task widgets in main content.
+
+![Screen Shot 2020-01-18 at 12 29 01](https://user-images.githubusercontent.com/27420533/72663781-2d1b8780-39ee-11ea-9869-89f31c47eee7.png)
+
+
+8- Don't Forget to initiate itemCount in ListView.
+
+
+![Screen Shot 2020-01-18 at 12 32 09](https://user-images.githubusercontent.com/27420533/72663829-b59a2800-39ee-11ea-8b3d-96458d521060.png)
+
+
+### Event Page
+
+1- Create the StatefulWidget in the event_page.dart and import the material.dart package.
+
+2- Now in the _EventPageState change the return Column to return Listview.builder.
+
+```ruby
+class _EventPageState extends State<EventPage> {
+  @override
+  Widget build(BuildContext context) {
+    double iconSize = 20;
+
+    return ListView.builder(
+      itemCount: _eventList.length,
+      padding: const EdgeInsets.all(0),
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(left: 24.0, right: 24),
+                              
+                                         
+```
+3- We have icon, time and description,so we wrap all to Row.
 
 
 
+```ruby
+
+     child: Row(
+            children: <Widget>[
+              _lineStyle(context, iconSize, index, _eventList.length,
+                  _eventList[index].isFinish),
+              _displayTime(_eventList[index].time),
+              _displayContent(_eventList[index]) 
+     
+                                         
+```
+
+4- For description we wrap in Column because it have 2 lines.
 
 
+![Screen Shot 2020-01-18 at 13 14 34](https://user-images.githubusercontent.com/27420533/72664334-871f4b80-39f4-11ea-955e-c2ebe1efbc97.png)
+
+5- Now it's time to draw the line.
 
 
+```ruby
+Widget _lineStyle(BuildContext context, double iconSize, int index,
+      int listLength, bool isFinish) {
+    return Container(
+        decoration: CustomIconDecoration(
+            iconSize: iconSize,
+            lineWidth: 1,
+            firstData: index == 0 ?? true,
+            lastData: index == listLength - 1 ?? true),
+        child: Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(50)),
+              boxShadow: [
+                BoxShadow(
+                    offset: Offset(0, 3),
+                    color: Color(0x20000000),
+                    blurRadius: 5)
+              ]),
+              
+ ``` 
+ 6- Define the position for Draw Line.
+ 
+ 
+```ruby 
+   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
+    final leftOffset = Offset((iconSize / 2) + 24, offset.dy);
+    final double iconSpace = iconSize / 1.5;
+
+    final Offset top = configuration.size.topLeft(Offset(leftOffset.dx, 0.0));
+    final Offset centerTop = configuration.size
+        .centerLeft(Offset(leftOffset.dx, leftOffset.dy - iconSpace));
+
+    final Offset centerBottom = configuration.size
+        .centerLeft(Offset(leftOffset.dx, leftOffset.dy + iconSpace));
+    final Offset end =
+    configuration.size.bottomLeft(Offset(leftOffset.dx, leftOffset.dy * 2));
+
+    if (!firstData) canvas.drawLine(top, centerTop, paintLine);
+    if (!lastData) canvas.drawLine(centerBottom, end, paintLine);
+  }
+}
+              
+ ``` 
+ 
+7- Define value for Icon Size, and assign value for firstData and LastData.
 
 
+```ruby 
+return Container(
+        decoration: CustomIconDecoration(
+            iconSize: iconSize,
+            lineWidth: 1,
+            firstData: index == 0 ?? true,
+            lastData: index == listLength - 1 ?? true),
+              
+ ``` 
+8- Create the Object for Event.
 
+```ruby 
+class Event {
+  final String time;
+  final String task;
+  final String desc;
+  final bool isFinish;
 
+  const Event(this.time, this.task, this.desc, this.isFinish);
+}
 
+final List<Event> _eventList = [
+  new Event("08:00", "Have coffe with Sam", "Personal", true),
+  new Event("10:00", "Meet with sales", "Work", true),
+  new Event("12:00", "Call Tom about appointment", "Work", false),
+  new Event("14:00", "Fix onboarding experience", "Work", false),
+  new Event("16:00", "Edit API documentation", "Personal", false),
+  new Event("18:00", "Setup user focus group", "Personal", false),
+];
 
+              
+ ``` 
+ 
 
-
-
-
-
-
-
-
+ 
+     
+     
+     
+     
