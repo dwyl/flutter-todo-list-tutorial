@@ -387,9 +387,57 @@ final List<Event> _eventList = [
               
  ``` 
  
+## Insert Page
 
+1- Create a new Dart file called "add_task_page.dart",import your material.dart and create a new StatefulWidget.<br />
+After that change the Return Container to Return Text and add the Text "Add New Task".<br />
+
+```ruby
+  mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Center(
+              child: Text(
+                "Add new task",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              )),
  
+              
+ ```      
      
+2- Create a CustomTextField that contais a labelText with the Text "Enter task Name".     
      
-     
-     
+```ruby
+     CustomTextField(
+              labelText: 'Enter task name', controller: _textTaskControler),
+          SizedBox(height: 12),
+              
+ ```   
+ 
+ 3- Create a new Package Called Widgets , inside this package is where all the elements of interaction that we will use in our application will be.
+ 
+ 
+ ![Screen Shot 2020-01-18 at 21 58 08](https://user-images.githubusercontent.com/27420533/72671141-be661a80-3a3d-11ea-849d-93fb89063ed8.png)
+ 
+ 
+ 4- Create a Dart file called Custom_button.dart, inside that button add the StatelessWidget and import the material.dart.<br />
+ Create the CustomButton Object.<br />
+      
+```ruby
+import 'package:flutter/material.dart';
+
+class CustomButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String buttonText;
+  final Color color;
+  final Color textColor;
+  final Color borderColor;
+
+              
+ ```  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
