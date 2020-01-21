@@ -56,6 +56,17 @@ If you need to open an issue here is the link to open that issue: https://github
 
 Moor is an easy to use, reactive persistence library for Flutter apps. Define your database tables in pure Dart and enjoy a fluent query API, auto-updating streams and more!
 
+### MOOR advantages:
+
+- **Flexible:** Moor let's you write queries in both SQL and Dart, providing fluent apis for both languages. You can filter and order results or use joins to run queries on multiple tables.
+- **Feature rich:** Moor has builtin support for transactions, schema migrations, complex filters and expressions, batched updates and joins.
+- **Modular:** Thanks to builtin support for daos and imports in sql files, moor helps you keep your database code simple.
+-  **Safe:** Moor generates typesafe code based on your tables and queries. If you make a mistake in your queries, moor will find it at compile time and provide helpful and descriptive lints.
+- **Fast:** Even though moor lets you write powerful queries, it can keep up with the performance of key-value stores like shared preferences and Hive. 
+- **Cross-Platform support:** Moor works on Android, iOS, macOS, Windows, Linux and the web. 
+
+If you want to start using MOOR here is the link : https://moor.simonbinder.eu/docs/getting-started/
+
 ## _How?_
 
 
