@@ -69,6 +69,17 @@ If you want to start using MOOR here is the link : https://moor.simonbinder.eu/d
 
 ## _How?_
 
+### Pre-requisites (Before you Start)
+1. **Flutter Installation**<br />
+  see: https://github.com/dwyl/learn-flutter <br />
+  > _**Note**: if you already have `Flutter ` installed on your Mac,
+  and just want to upgrade to the latest version, run:_
+  **`flutter upgrade`**
+  
+2.**Android Studio** or **Visual Studio Code**<br />
+See:https://developer.android.com/studio or https://code.visualstudio.com/download<br />
+
+
 
  1-Create a new Flutter Project.
 
