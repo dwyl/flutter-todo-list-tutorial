@@ -1,13 +1,12 @@
 <div align="center">
+  # Todo List Flutter Tutorial
+  <!-- TODO: add Travis and other badges-->
+  A **_step-by-step_ tutorial** showing how to 
+  build a **Todo List App _from scratch_** in **Flutter**.
 
-# Todo List Flutter Tutorial
-
-A **_step-by-step_ tutorial** showing how to 
-build a **Todo List App _from scratch_** in **Flutter**.
-
-![Screen Shot 2020-01-15 at 11 04 33](https://user-images.githubusercontent.com/27420533/72429017-d8c29e80-3786-11ea-9682-303989093526.png)
-
-</div>
+  <!-- TODO: switch image to gif -->
+  ![todo-application](https://user-images.githubusercontent.com/27420533/72429017-d8c29e80-3786-11ea-9682-303989093526.png)
+ </div>
 
 ## Why?
 
