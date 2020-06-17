@@ -56,7 +56,7 @@ If you need to open an issue here is the link to open that issue: https://github
 
 Moor is an easy to use, reactive persistence library for Flutter apps. Define your database tables in pure Dart and enjoy a fluent query API, auto-updating streams and more!
 
-### MOOR advantages:
+### MOOR advantages
 
 - **Flexible:** Moor let's you write queries in both SQL and Dart, providing fluent apis for both languages. You can filter and order results or use joins to run queries on multiple tables.
 - **Feature rich:** Moor has builtin support for transactions, schema migrations, complex filters and expressions, batched updates and joins.
@@ -68,6 +68,75 @@ Moor is an easy to use, reactive persistence library for Flutter apps. Define yo
 If you want to start using MOOR here is the link : https://moor.simonbinder.eu/docs/getting-started/
 
 ## _How?_
+
+### Try it first!
+
+The first step is to make sure Dart and Flutter
+are installed on your machine.
+The [install instructions](https://flutter.dev/docs/get-started/install) on the Flutter website
+explain the installation process in detail.
+If you have any issues you can also look at our [learn-fluter](https://github.com/dwyl/learn-flutter)
+repository and [open an issue](https://github.com/dwyl/learn-flutter/issues) if your are still stuck.
+
+You can then test the application.
+Clone the repository:
+
+```sh
+git clone git@github.com:dwyl/flutter-todo-list-tutorial.git && cd flutter-todo-list-tutorial
+```
+
+<!-- TODO: describe command to run project -->
+
+### Create a new Flutter project
+
+Run the flutter create command to create the `app` project:
+
+```sh
+flutter create app
+```
+
+This will create automatically the files for the project:
+
+```sh
+Creating project app...
+  app\.gitignore (created)
+  app\.idea\libraries\Dart_SDK.xml (created)
+  app\.idea\libraries\Flutter_for_Android.xml (created)
+  app\.idea\libraries\KotlinJavaRuntime.xml (created)
+  app\.idea\modules.xml (created)
+  app\.idea\runConfigurations\main_dart.xml (created)
+  app\.idea\workspace.xml (created)
+  app\.metadata (created
+```
+
+and if everything is ok you should see the following result:
+
+```sh
+All done!
+[✓] Flutter: is fully installed. (Channel stable, v1.17.3, on Microsoft Windows [Version 10.0.18363.900], locale en-GB)
+[✓] Android toolchain - develop for Android devices: is fully installed. (Android SDK version 30.0.0)
+[✓] Android Studio: is fully installed. (version 4.0)
+[✓] VS Code: is fully installed. (version 1.46.0)
+[!] Connected device: is not available.
+
+Run "flutter doctor" for information about installing additional components.
+
+In order to run your application, type:
+
+  $ cd app
+  $ flutter run
+
+Your application code is in app\lib\main.dart.
+```
+
+Before running the application
+make sure you have 1 device connected to your machine
+(see how to [enable the developer options and the USB debugging](https://developer.android.com/studio/debug/dev-options) on android,
+see also the [Flutter Android setup documentation](https://flutter.dev/docs/get-started/install/windows#set-up-your-android-device))
+or 1 emulator setup.
+
+
+
 
 ### Pre-requisites (Before you Start)
 1. **Flutter Installation**<br />
