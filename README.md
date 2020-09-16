@@ -1,5 +1,7 @@
 # Flutter TodoList Tutorial
 
+[![Build Status](https://travis-ci.com/dwyl/flutter-todo-list-tutorial.svg?branch=master)](https://travis-ci.com/dwyl/flutter-todo-list-tutorial)
+
 Create a simple todolist Flutter application
 
 ## Structure of a Flutter application
