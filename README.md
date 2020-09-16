@@ -1,7 +1,5 @@
 # Flutter TodoList Tutorial
 
-[![Build Status](https://travis-ci.com/dwyl/flutter-todo-list-tutorial.svg?branch=master)](https://travis-ci.com/dwyl/flutter-todo-list-tutorial)
-
 Create a simple todolist Flutter application
 
 ## Structure of a Flutter application
@@ -32,10 +30,49 @@ see also:
 
 ### Material Design
 
+[Material Design](https://material.io/design/introduction) is a guideline to create user interface.
+Flutter implements the guideline with the [material components widgets](https://flutter.dev/docs/development/ui/widgets/material).
+This list of widgest allow us to create rapdly a UI folling the best practices from material design.
+To use these widgets you need first to import the `material` Dart package with `import 'package:flutter/material.dart';`
+You can then browse all the material widgets and select the ones required for your application <https://api.flutter.dev/flutter/material/material-library.html>
+
+You have also the possiblity of creating an IOs look by using the [Cupertino widgets](https://flutter.dev/docs/development/ui/widgets/cupertino)
+
 ## Initialise application
+
+### A quick CLI tour
 
 Create application:
 
 ```sh
 flutter create --org com.dwyl --project-name todolist .
 ```
+
+```sh
+flutter run
+```
+
+```sh
+flutter test
+```
+
+### Main Widgets used
+
+- [Scaffold](https://api.flutter.dev/flutter/material/Scaffold-class.html)
+- [AppBar](https://api.flutter.dev/flutter/material/AppBar-class.html)
+- [CheckboxListTile](https://api.flutter.dev/flutter/material/CheckboxListTile-class.html)
+- [ListView](https://api.flutter.dev/flutter/widgets/ListView-class.html)
+- [TextField](https://api.flutter.dev/flutter/material/TextField-class.html)
+
+### Create the application
+
+- [runApp](https://api.flutter.dev/flutter/widgets/runApp.html)
+- [MaterialApp](https://api.flutter.dev/flutter/material/MaterialApp-class.html)
+
+see also:
+
+- <https://medium.com/@greg.perry/decode-materialapp-b730ee4eaed1>
+
+### Stateless and Statefull widget
+
+### Tests
