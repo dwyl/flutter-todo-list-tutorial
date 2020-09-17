@@ -36,7 +36,7 @@ This list of widgest allow us to create rapdly a UI folling the best practices f
 To use these widgets you need first to import the `material` Dart package with `import 'package:flutter/material.dart';`
 You can then browse all the material widgets and select the ones required for your application <https://api.flutter.dev/flutter/material/material-library.html>
 
-You have also the possiblity of creating an IOs look by using the [Cupertino widgets](https://flutter.dev/docs/development/ui/widgets/cupertino)
+You have also the possiblity to create an IOs look by using the [Cupertino widgets package](https://flutter.dev/docs/development/ui/widgets/cupertino)
 
 ## Initialise application
 
@@ -44,17 +44,18 @@ You have also the possiblity of creating an IOs look by using the [Cupertino wid
 
 Create application:
 
+You can create a new Flutter project with the following command line:
+
 ```sh
 flutter create --org com.dwyl --project-name todolist .
 ```
+This will create the project `todolist` in the current folder `.`.
+The `--org` flag uses the [reverse domain name notation](https://en.wikipedia.org/wiki/Reverse_domain_name_notation) to identify your application.
 
-```sh
-flutter run
-```
+You can then run the application with `flutter run` and run the tests with `flutter test`.
 
-```sh
-flutter test
-```
+For the list of command type `flutter help`.
+For more details about a specific command, for example `create`, run `flutter create --help`
 
 ### Main Widgets used
 
@@ -63,16 +64,46 @@ flutter test
 - [CheckboxListTile](https://api.flutter.dev/flutter/material/CheckboxListTile-class.html)
 - [ListView](https://api.flutter.dev/flutter/widgets/ListView-class.html)
 - [TextField](https://api.flutter.dev/flutter/material/TextField-class.html)
+- [Column](https://api.flutter.dev/flutter/widgets/Column-class.html)
+- [Expanded](https://api.flutter.dev/flutter/widgets/Expanded-class.html)
+
+Note that the `Column` and `Exapanded` widgets are "space" widgets.
+
+Flutter provide a widget inspector where you can see the full tree
+of the application:
+
+![widget tree](https://user-images.githubusercontent.com/6057298/93480078-f6876b00-f8f4-11ea-95df-3c81321e8284.png)
 
 ### Create the application
 
 - [runApp](https://api.flutter.dev/flutter/widgets/runApp.html)
 - [MaterialApp](https://api.flutter.dev/flutter/material/MaterialApp-class.html)
 
+Dart requires a `main` function to be defined to create the start of your program.
+
+```dart
+void main() {
+    print('hello');
+}
+```
+
+the `runApp` function is used in the main function and takes a widget as parameter.
+This widget becomes the root element of your application and it is displayed on the
+user screen.
+
+The `MaterialApp` widget create a material design application.
+
+```dart
+void main() {
+  runApp(MaterialApp(title: 'TodoList', home: App()));
+```
+
 see also:
 
 - <https://medium.com/@greg.perry/decode-materialapp-b730ee4eaed1>
 
 ### Stateless and Statefull widget
+
+
 
 ### Tests
