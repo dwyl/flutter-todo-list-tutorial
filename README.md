@@ -2,9 +2,7 @@
 
 Create a simple todolist Flutter application
 
-## Structure of a Flutter application
-
-### Widgets
+## Widgets
 
 Flutter is using Widgets to create the applications' UI.
 Widgets let you declare how and what to render on the screen.
@@ -28,6 +26,26 @@ see also:
 - widget index: <https://flutter.dev/docs/reference/widgets>
 - widget of the week on Youtube: <https://www.youtube.com/watch?v=b_sQ9bMltGU&list=PLjxrf2q8roU23XGwz3Km7sQZFTdB996iG>
 
+## Create a new Flutter application
+
+### A quick CLI tour
+
+You can create a new Flutter project with the following command line:
+
+```sh
+flutter create --org com.dwyl --project-name todolist .
+```
+
+This will create the project `todolist` in the current folder `.`.
+The `--org` flag uses the [reverse domain name notation](https://en.wikipedia.org/wiki/Reverse_domain_name_notation) to identify your application.
+
+You can then run the application with `flutter run` and run the tests with `flutter test`.
+
+For the list of command type `flutter help`.
+For more details about a specific command, for example `create`, run `flutter create --help`
+
+
+
 ### Material Design
 
 [Material Design](https://material.io/design/introduction) is a guideline to create user interface.
@@ -38,24 +56,6 @@ You can then browse all the material widgets and select the ones required for yo
 
 You have also the possiblity to create an IOs look by using the [Cupertino widgets package](https://flutter.dev/docs/development/ui/widgets/cupertino)
 
-## Initialise application
-
-### A quick CLI tour
-
-Create application:
-
-You can create a new Flutter project with the following command line:
-
-```sh
-flutter create --org com.dwyl --project-name todolist .
-```
-This will create the project `todolist` in the current folder `.`.
-The `--org` flag uses the [reverse domain name notation](https://en.wikipedia.org/wiki/Reverse_domain_name_notation) to identify your application.
-
-You can then run the application with `flutter run` and run the tests with `flutter test`.
-
-For the list of command type `flutter help`.
-For more details about a specific command, for example `create`, run `flutter create --help`
 
 ### Main Widgets used
 
@@ -97,6 +97,8 @@ The `MaterialApp` widget create a material design application.
 void main() {
   runApp(MaterialApp(title: 'TodoList', home: App()));
 ```
+
+Note that the `App` widget is created later on as a `StatelessWidget`.
 
 see also:
 
