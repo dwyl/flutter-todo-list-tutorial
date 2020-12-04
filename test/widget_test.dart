@@ -11,7 +11,7 @@ import 'package:todolist/main.dart';
 
 void main() {
   test('Item created has completed to false', () {
-    final item = Item('new item');
+    final item = Task(text: 'new item');
 
     expect(item.completed, false);
   });

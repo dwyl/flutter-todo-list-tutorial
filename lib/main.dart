@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MaterialApp(title: 'TodoList', home: App()));
+  return runApp(
+    MaterialApp(title: 'TodoList', home: App())
+  );
 }
 
 class App extends StatelessWidget {
@@ -15,24 +17,27 @@ class App extends StatelessWidget {
   }
 }
 
-class Item {
-  String value;
+class Task {
+  final String text;
   bool completed;
 
-  Item(this.value, [this.completed = false]);
+  Task({this.text, this.completed = false});
 }
 
-class ShowItem extends StatefulWidget {
-  final Item item;
+// Because an item can be toggle completed/uncompleted
+// the showItem class is created as statefull
+class TaskWidget extends StatefulWidget {
+  final Task task;
 
-  ShowItem(this.item);
+  TaskWidget({this.task}); // constructor with named parameter item
 
   @override
-  _ShowItem createState() => _ShowItem();
+  _TaskWidget createState() => _TaskWidget();
 }
 
-class _ShowItem extends State<ShowItem> {
-  TextStyle _itemStyle(completed) {
+class _TaskWidget extends State<TaskWidget> {
+  // method to style completed/uncompleted item
+  TextStyle _taskStyle(completed) {
     if (completed)
       return TextStyle(
         color: Colors.black54,
@@ -46,13 +51,13 @@ class _ShowItem extends State<ShowItem> {
   Widget build(BuildContext context) {
     return CheckboxListTile(
       title: Text(
-        widget.item.value,
-        style: _itemStyle(widget.item.completed),
+        widget.task.text, // access the task text from the TaskWidget class with widget.task property
+        style: _taskStyle(widget.task.completed),
       ),
-      value: widget.item.completed,
+      value: widget.task.completed,
       onChanged: (newValue) {
         setState(() {
-          widget.item.completed = newValue;
+          widget.task.completed = newValue;
         });
       },
       controlAffinity: ListTileControlAffinity.leading,
@@ -60,14 +65,15 @@ class _ShowItem extends State<ShowItem> {
   }
 }
 
+// The TodoList class is statefull
+// to allow new item to be added to the list of tasks
 class TodoList extends StatefulWidget {
   @override
   _TodoListState createState() => _TodoListState();
 }
 
 class _TodoListState extends State<TodoList> {
-  List<Item> _items = [];
-
+  final List<Task> _tasks = [];
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -75,20 +81,18 @@ class _TodoListState extends State<TodoList> {
     return Column(children: [
       Expanded(
           child: ListView(
-        children: _items.map((Item item) {
-          return ShowItem(item);
-        }).toList(),
+            children: _tasks.map((Task task) => TaskWidget(task: task)).toList(),
       )),
       TextField(
         controller: _controller,
         decoration: InputDecoration(
             border:
                 OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)),
-            labelText: 'new item'),
-        onSubmitted: (newItem) {
+            labelText: 'new task'),
+        onSubmitted: (newTask) {
           setState(() {
-            _items.add(Item(newItem));
-            _controller.clear();
+          _tasks.add(Task(text: newTask));
+            _controller.clear(); // clear the text input when an item is added to the list of tasks
           });
         },
       )
