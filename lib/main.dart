@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   return runApp(
@@ -77,6 +78,9 @@ class _TodoListState extends State<TodoList> {
   final TextEditingController _controller = TextEditingController();
 
   @override
+
+
+  @override
   Widget build(BuildContext context) {
     return Column(children: [
       Expanded(
@@ -97,5 +101,13 @@ class _TodoListState extends State<TodoList> {
         },
       )
     ]);
+  }
+
+  @override
+  void initState() {
+    _tasks
+    ..add(Task(text: 'default task'))
+    ..add(Task(text: 'anotherstuff', completed: true));
+    super.initState();
   }
 }
