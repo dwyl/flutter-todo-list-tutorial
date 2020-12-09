@@ -5,4 +5,12 @@ class Task {
   bool completed;
 
   Task({this.text, this.completed = false});
+
+  Task.fromJson(Map<String, dynamic> json)
+      : text = json['text'],
+        completed = json['copmpleted'];
+
+  Map<String, dynamic> toJson(Task task) {
+    return {'text': task.text, 'completed': task.completed};
+  }
 }

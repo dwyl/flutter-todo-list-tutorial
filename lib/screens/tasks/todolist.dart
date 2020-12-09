@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../models/task.dart';
-import './task.dart';
+import 'package:todolist/models/task.dart';
+import 'package:todolist/screens/tasks/task.dart';
+
 // The TodoList class is statefull
 // to allow new item to be added to the list of tasks
 class TodoList extends StatefulWidget {

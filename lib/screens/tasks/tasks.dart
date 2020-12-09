@@ -1,4 +1,4 @@
-import './todolist.dart';
+import 'package:todolist/screens/tasks/todolist.dart';
 import 'package:flutter/material.dart';
 
 class Tasks extends StatelessWidget {

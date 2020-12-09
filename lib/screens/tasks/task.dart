@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/task.dart';
+import 'package:todolist/models/task.dart';
 // Because an item can be toggle completed/uncompleted
 // the showItem class is created as statefull
 class TaskWidget extends StatefulWidget {
