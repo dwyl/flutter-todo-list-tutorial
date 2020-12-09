@@ -44,8 +44,6 @@ You can then run the application with `flutter run` and run the tests with `flut
 For the list of command type `flutter help`.
 For more details about a specific command, for example `create`, run `flutter create --help`
 
-
-
 ### Material Design
 
 [Material Design](https://material.io/design/introduction) is a guideline to create user interface.
@@ -55,7 +53,6 @@ To use these widgets you need first to import the `material` Dart package with `
 You can then browse all the material widgets and select the ones required for your application <https://api.flutter.dev/flutter/material/material-library.html>
 
 You have also the possiblity to create an IOs look by using the [Cupertino widgets package](https://flutter.dev/docs/development/ui/widgets/cupertino)
-
 
 ### Main Widgets used
 
@@ -105,7 +102,5 @@ see also:
 - <https://medium.com/@greg.perry/decode-materialapp-b730ee4eaed1>
 
 ### Stateless and Statefull widget
-
-
 
 ### Tests

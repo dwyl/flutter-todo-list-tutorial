@@ -8,9 +8,7 @@ class Task {
 
   Task.fromJson(Map<String, dynamic> json)
       : text = json['text'],
-        completed = json['copmpleted'];
+        completed = json['completed'];
 
-  Map<String, dynamic> toJson(Task task) {
-    return {'text': task.text, 'completed': task.completed};
-  }
+  Map<String, dynamic> toJson() => {'text': text, 'completed': completed};
 }
