@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
+
 /// Task model
 /// A task contains a string text and a status completed.
-class Task {
+class Task extends ChangeNotifier {
   final String text;
   bool completed;
 
@@ -11,4 +13,9 @@ class Task {
         completed = json['completed'];
 
   Map<String, dynamic> toJson() => {'text': text, 'completed': completed};
+
+  void toggle() {
+    completed = !completed;
+    notifyListeners();
+  }
 }

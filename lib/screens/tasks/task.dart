@@ -5,7 +5,7 @@ import 'package:todolist/models/task.dart';
 class TaskWidget extends StatefulWidget {
   final Task task;
 
-  TaskWidget({this.task}); // constructor with named parameter item
+  TaskWidget({this.task}); // constructor with named parameter task
 
   @override
   _TaskWidget createState() => _TaskWidget();
