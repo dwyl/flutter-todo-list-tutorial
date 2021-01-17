@@ -14,8 +14,11 @@ class TodoList extends StatelessWidget {
     return Column(children: [
       Expanded(child: Consumer<TodoListModel>(builder: (context, tasks, child) {
         return ListView(
-          children:
-              tasks.tasks.map((Task task) => TaskWidget(task: task)).toList(),
+          children: tasks.tasks.map((Task task) {
+            return ChangeNotifierProvider.value(
+                value: task, child: TaskWidget()
+            );
+          }).toList(),
         );
       })),
       Consumer<TodoListModel>(
@@ -27,7 +30,7 @@ class TodoList extends StatelessWidget {
                     borderSide: BorderSide(color: Colors.teal)),
                 labelText: 'new task'),
             onSubmitted: (newTask) {
-              tasks.addTaks(Task(text: newTask));
+              tasks.addTaks(Task(text: newTask)); // create new instance of
               _controller.clear(); // clear the text input after adding taks
               saveTasksToSharedPrefs(tasks.tasks);
             },

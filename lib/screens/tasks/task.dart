@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/models/task.dart';
+import 'package:provider/provider.dart';
 // Because an item can be toggle completed/uncompleted
 // the showItem class is created as statefull
-class TaskWidget extends StatefulWidget {
-  final Task task;
 
-  TaskWidget({this.task}); // constructor with named parameter task
-
-  @override
-  _TaskWidget createState() => _TaskWidget();
-}
-
-class _TaskWidget extends State<TaskWidget> {
+class TaskWidget extends StatelessWidget {
   // method to style completed/uncompleted item
   TextStyle _taskStyle(completed) {
     if (completed)
@@ -25,18 +18,18 @@ class _TaskWidget extends State<TaskWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return CheckboxListTile(
-      title: Text(
-        widget.task.text, // access the task text from the TaskWidget class with widget.task property
-        style: _taskStyle(widget.task.completed),
-      ),
-      value: widget.task.completed,
-      onChanged: (newValue) {
-        setState(() {
-          widget.task.completed = newValue;
-        });
-      },
-      controlAffinity: ListTileControlAffinity.leading,
-    );
+    return Consumer<Task>(builder: (context, task, child) {
+      return CheckboxListTile(
+        title: Text(
+          task.text,
+          style: _taskStyle(task.completed),
+        ),
+        value: task.completed,
+        onChanged: (newValue) {
+          task.toggle();
+        },
+        controlAffinity: ListTileControlAffinity.leading,
+      );
+    });
   }
 }
