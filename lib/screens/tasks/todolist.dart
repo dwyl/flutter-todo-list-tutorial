@@ -1,12 +1,15 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todolist/models/task.dart';
 import 'package:todolist/models/todoList.dart';
 import 'package:todolist/screens/tasks/task.dart';
 import 'package:provider/provider.dart';
 
-class TodoList extends StatelessWidget {
+class TodoList extends StatefulWidget {
+  @override
+  _TodoList createState() => _TodoList();
+}
+
+class _TodoList extends State<TodoList> {
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -16,8 +19,7 @@ class TodoList extends StatelessWidget {
         return ListView(
           children: tasks.tasks.map((Task task) {
             return ChangeNotifierProvider.value(
-                value: task, child: TaskWidget()
-            );
+                value: task, child: TaskWidget());
           }).toList(),
         );
       })),
@@ -32,7 +34,7 @@ class TodoList extends StatelessWidget {
             onSubmitted: (newTask) {
               tasks.addTaks(Task(text: newTask)); // create new instance of
               _controller.clear(); // clear the text input after adding taks
-              saveTasksToSharedPrefs(tasks.tasks);
+              tasks.saveTasksToSharedPrefs();
             },
           );
         },
@@ -41,29 +43,4 @@ class TodoList extends StatelessWidget {
   }
 }
 
-Future<void> getTasksFromSharedPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
-  //prefs.clear();
-  final tasksJson =
-      prefs.getString('tasks') ?? '[{"text": "hello", "completed": true}]';
-  // https://flutter.dev/docs/cookbook/networking/background-parsing#convert-the-response-into-a-list-of-photos
-  final jsonListTasks = jsonDecode(tasksJson).cast<Map<String, dynamic>>();
 
-  final tasks = jsonListTasks.map<Task>((m) => Task.fromJson(m)).toList();
-  //setState(() {
-  //  _tasks = tasks;
-  //});
-}
-
-Future<void> saveTasksToSharedPrefs(List<Task> tasks) async {
-  final prefs = await SharedPreferences.getInstance();
-  final json = jsonEncode(tasks);
-  prefs.setString('tasks', json);
-}
-
-  //void initState() {
-    //// super.initState must be called first
-    //super.initState();
-    //getTasksFromSharedPrefs();
-  //}
-//}

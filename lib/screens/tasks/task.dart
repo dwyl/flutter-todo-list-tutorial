@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/models/task.dart';
 import 'package:provider/provider.dart';
+import 'package:todolist/models/todoList.dart';
 // Because an item can be toggle completed/uncompleted
 // the showItem class is created as statefull
 
@@ -27,6 +28,7 @@ class TaskWidget extends StatelessWidget {
         value: task.completed,
         onChanged: (newValue) {
           task.toggle();
+          Provider.of<TodoListModel>(context, listen: false).saveTasksToSharedPrefs();
         },
         controlAffinity: ListTileControlAffinity.leading,
       );
