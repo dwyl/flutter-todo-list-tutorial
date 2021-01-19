@@ -11,8 +11,8 @@ class Tasks extends StatelessWidget {
           title: Text('TodoList'),
         ),
         body: ChangeNotifierProvider(
-          create: (context) => TodoListModel.init(),
-          child: TodoList() ,)
+          create: (context) => TodoListModel(),
+          child: TodoListWidget() ,)
     );
   }
 }

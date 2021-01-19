@@ -19,7 +19,7 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Task>(builder: (context, task, child) {
+    return Consumer<TaskModel>(builder: (context, task, child) {
       return CheckboxListTile(
         title: Text(
           task.text,

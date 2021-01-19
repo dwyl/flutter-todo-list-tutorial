@@ -4,12 +4,7 @@ import 'package:todolist/models/todoList.dart';
 import 'package:todolist/screens/tasks/task.dart';
 import 'package:provider/provider.dart';
 
-class TodoList extends StatefulWidget {
-  @override
-  _TodoList createState() => _TodoList();
-}
-
-class _TodoList extends State<TodoList> {
+class TodoListWidget extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -17,7 +12,7 @@ class _TodoList extends State<TodoList> {
     return Column(children: [
       Expanded(child: Consumer<TodoListModel>(builder: (context, tasks, child) {
         return ListView(
-          children: tasks.tasks.map((Task task) {
+          children: tasks.tasks.map((TaskModel task) {
             return ChangeNotifierProvider.value(
                 value: task, child: TaskWidget());
           }).toList(),
@@ -32,7 +27,7 @@ class _TodoList extends State<TodoList> {
                     borderSide: BorderSide(color: Colors.teal)),
                 labelText: 'new task'),
             onSubmitted: (newTask) {
-              tasks.addTaks(Task(text: newTask)); // create new instance of
+              tasks.addTaks(TaskModel(text: newTask)); // create new instance of task changeNotifier model
               _controller.clear(); // clear the text input after adding taks
               tasks.saveTasksToSharedPrefs();
             },
@@ -42,5 +37,3 @@ class _TodoList extends State<TodoList> {
     ]);
   }
 }
-
-

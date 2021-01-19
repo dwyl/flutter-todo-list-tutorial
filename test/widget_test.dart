@@ -10,7 +10,7 @@ import 'package:todolist/models/task.dart';
 
 void main() {
   test('Item created has completed to false', () {
-    final item = Task(text: 'new item');
+    final item = TaskModel(text: 'new item');
 
     expect(item.completed, false);
   });

@@ -4,24 +4,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class TodoListModel extends ChangeNotifier {
-  List<Task> tasks = [];
+  List<TaskModel> tasks = [];
 
-  TodoListModel.init() {
+  TodoListModel() {
     getTasksFromSharedPrefs();
   }
 
-  void addTaks(Task task) {
+  void addTaks(TaskModel task) {
     tasks.add(task);
     notifyListeners();
   }
 
   Future<void> getTasksFromSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final tasksJson =
-        prefs.getString('tasks') ?? '[{"text": "hello", "completed": true}]';
+    final tasksJson = prefs.getString('tasks') ?? '[]';
     // https://flutter.dev/docs/cookbook/networking/background-parsing#convert-the-response-into-a-list-of-photos
     final jsonListTasks = jsonDecode(tasksJson).cast<Map<String, dynamic>>();
-    tasks = jsonListTasks.map<Task>((m) => Task.fromJson(m)).toList();
+    tasks = jsonListTasks.map<TaskModel>((m) => TaskModel.fromJson(m)).toList();
     notifyListeners();
   }
 
