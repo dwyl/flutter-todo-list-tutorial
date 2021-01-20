@@ -1,11 +1,19 @@
-# see https://github.com/marketplace/actions/flutter-action
-steps:
-- uses: actions/checkout@v2
-- uses: actions/setup-java@v1
-  with:
-    java-version: '12.x'
-- uses: subosito/flutter-action@v1
-  with:
-    flutter-version: '1.22.5'
-- run: flutter pub get
-- run: flutter test
+name: CI
+on: [push, pull_request]
+jobs:
+  flutter-ci:
+    name: run tests
+    runs-on: ubuntu-latest
+  # see https://github.com/marketplace/actions/flutter-action
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '12.x'
+    - uses: subosito/flutter-action@v1
+      with:
+        flutter-version: '1.22.x'
+        channel: 'stable'
+    - run: flutter pub get
+    - run: flutter analyse
+    - run: flutter test
