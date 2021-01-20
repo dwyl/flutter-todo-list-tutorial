@@ -10,4 +10,12 @@ void main() {
     expect(t.text, 'task #1');
     expect(t.toJson(), json);
   });
+
+  test('Toggle task completed/uncompleted', () {
+    final item = TaskModel(text: 'new item', completed: false);
+    item.toggle();
+    expect(item.completed, true);
+    item.toggle();
+    expect(item.completed, false);
+  });
 }
