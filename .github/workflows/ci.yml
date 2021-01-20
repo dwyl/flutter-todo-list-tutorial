@@ -15,5 +15,5 @@ jobs:
         flutter-version: '1.22.x'
         channel: 'stable'
     - run: flutter pub get
-    - run: flutter analyse
+    - run: flutter analyze
     - run: flutter test
