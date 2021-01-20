@@ -21,3 +21,4 @@ doc/api/
 *.js.map
 coverage/
 .flutter-plugins-dependencies
+lib/generated_plugin_registrant.dart
