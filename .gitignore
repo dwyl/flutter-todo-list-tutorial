@@ -22,3 +22,5 @@ doc/api/
 coverage/
 .flutter-plugins-dependencies
 lib/generated_plugin_registrant.dart
+# test file for coverage
+test/coverage_helper_test.dart

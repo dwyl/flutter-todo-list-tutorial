@@ -16,6 +16,7 @@ jobs:
         channel: 'stable'
     - run: flutter pub get
     - run: flutter analyze
+    - run: ./coverage_script.bash
     - run: flutter test --coverage
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
