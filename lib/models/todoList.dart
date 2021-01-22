@@ -6,10 +6,6 @@ import 'dart:convert';
 class TodoListModel extends ChangeNotifier {
   List<TaskModel> tasks = [];
 
-  TodoListModel() {
-    getTasksFromSharedPrefs();
-  }
-
   void addTaks(TaskModel task) {
     tasks.add(task);
     notifyListeners();
@@ -17,7 +13,7 @@ class TodoListModel extends ChangeNotifier {
 
   Future<void> getTasksFromSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final tasksJson = prefs.getString('tasks') ?? '[]';
+    final tasksJson = prefs.getString('tasks');
     // https://flutter.dev/docs/cookbook/networking/background-parsing#convert-the-response-into-a-list-of-photos
     final jsonListTasks = jsonDecode(tasksJson).cast<Map<String, dynamic>>();
     tasks = jsonListTasks.map<TaskModel>((m) => TaskModel.fromJson(m)).toList();
