@@ -5,13 +5,11 @@ import 'package:todolist/screens/tasks/tasks.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  testWidgets('Tasks widget', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Provider<TodoListModel>(create: (_) => TodoListModel(), child: Tasks())
-        )
-      );
-    
+  testWidgets('Test Todolist widget', (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(
+        home: Provider<TodoListModel>(
+            create: (_) => TodoListModel(), child: Scaffold(body: Tasks()))));
+
     // Check title exists
     final titleFinder = find.text('TodoList');
     expect(titleFinder, findsOneWidget);

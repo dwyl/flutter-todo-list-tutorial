@@ -104,3 +104,9 @@ see also:
 ### Stateless and Statefull widget
 
 ### Tests
+
+#### Unit tests
+
+#### Widget tests
+
+#### Integration tests

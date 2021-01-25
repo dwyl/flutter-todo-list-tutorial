@@ -8,7 +8,6 @@ class Tasks extends StatelessWidget {
   Widget build(BuildContext context) {
     final TodoListModel todoList = TodoListModel();
     todoList.getTasksFromSharedPrefs();
-
     return Scaffold(
         appBar: AppBar(
           title: Text('TodoList'),
