@@ -27,4 +27,26 @@ void main() {
     expect(textTask2, findsOneWidget);
     expect(textTask3, findsOneWidget);
   });
+
+  testWidgets('Add a new task', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+          home: ChangeNotifierProvider<TodoListModel>(
+              create: (_) => TodoListModel(),
+              child: Scaffold(body: TodoListWidget()))),
+    );
+    final textField = find.byType(TextField);
+    expect(textField, findsOneWidget);
+
+    // enter text in field
+    await tester.enterText(textField, 'task 1');
+    final textFieldWidget = tester.widget(textField) as TextField;
+    textFieldWidget.onSubmitted(textFieldWidget.controller.value.text);
+    await tester.pumpAndSettle();
+    await tester.pumpAndSettle();
+
+    // find new task created
+    expect(find.byType(CheckboxListTile), findsOneWidget);
+    expect(find.text('task 1'), findsOneWidget);
+  });
 }
