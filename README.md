@@ -100,13 +100,3 @@ Note that the `App` widget is created later on as a `StatelessWidget`.
 see also:
 
 - <https://medium.com/@greg.perry/decode-materialapp-b730ee4eaed1>
-
-### Stateless and Statefull widget
-
-### Tests
-
-#### Unit tests
-
-#### Widget tests
-
-#### Integration tests
