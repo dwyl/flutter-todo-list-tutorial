@@ -17,5 +17,14 @@ void main() {
     // check input field to create new task exists
     final textField = find.byType(TextField);
     expect(textField, findsOneWidget);
+   
+   // find completed icon
+   final completedIcon = find.byType(Icon);
+   expect(completedIcon, findsOneWidget);
+   await tester.tap(completedIcon);
+   await tester.pumpAndSettle();
+   final titleCompletedScreen = find.text('Completed Items');
+   expect(titleCompletedScreen, findsOneWidget);
+
   });
 }

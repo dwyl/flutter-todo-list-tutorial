@@ -10,7 +10,7 @@ class CompletedTasks extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('TodoList'),
+          title: Text('Completed Items'),
         ),
         body: ListView(
             children: todoList.getCompletedTasks().map((t) {
