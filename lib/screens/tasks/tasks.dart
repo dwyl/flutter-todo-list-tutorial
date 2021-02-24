@@ -5,15 +5,21 @@ import 'package:todolist/screens/tasks/todolist.dart';
 import 'package:flutter/material.dart';
 
 class Tasks extends StatelessWidget {
-  void _goToCompletedTasks(context) {
+  // display completed tasks screen
+  void _goToCompletedTasks(context, todoList) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => CompletedTasks()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => CompletedTasks(todoList: todoList)));
   }
 
   @override
   Widget build(BuildContext context) {
+    // get tasks from shared preferences
     final TodoListModel todoList = TodoListModel();
+    // getTasksFromSharedPrefs call notifyListeners
     todoList.getTasksFromSharedPrefs();
+
     return Scaffold(
         appBar: AppBar(
           title: Text('TodoList'),
@@ -22,7 +28,7 @@ class Tasks extends StatelessWidget {
                 padding: EdgeInsets.only(right: 20.0),
                 child: IconButton(
                     icon: Icon(Icons.check),
-                    onPressed: () => _goToCompletedTasks(context)))
+                    onPressed: () => _goToCompletedTasks(context, todoList)))
           ],
         ),
         body: ChangeNotifierProvider.value(

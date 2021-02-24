@@ -19,10 +19,24 @@ class TodoListModel extends ChangeNotifier {
     tasks = jsonListTasks.map<TaskModel>((m) => TaskModel.fromJson(m)).toList();
     notifyListeners();
   }
+  
+  Future<void> getCompletedTasksFromSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final tasksJson = prefs.getString('tasks') ?? '[]';
+    // https://flutter.dev/docs/cookbook/networking/background-parsing#convert-the-response-into-a-list-of-photos
+    final jsonListTasks = jsonDecode(tasksJson).cast<Map<String, dynamic>>();
+    tasks = jsonListTasks.map<TaskModel>((m) => TaskModel.fromJson(m)).toList();
+    tasks = tasks.where((t) => t.completed).toList();
+    notifyListeners();
+  }
 
   Future<void> saveTasksToSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final json = jsonEncode(tasks);
     prefs.setString('tasks', json);
+  }
+
+  List<TaskModel> getCompletedTasks() {
+    return tasks.where((t) => t.completed == true).toList();
   }
 }
