@@ -12,7 +12,7 @@ class TodoListWidget extends StatelessWidget {
     return Column(children: [
       Expanded(child: Consumer<TodoListModel>(builder: (context, tasks, child) {
         return ListView(
-          children: tasks.tasks.map((TaskModel task) {
+          children: tasks.tasks!.map((TaskModel task) {
             return ChangeNotifierProvider.value(
                 value: task, child: TaskWidget());
           }).toList(),

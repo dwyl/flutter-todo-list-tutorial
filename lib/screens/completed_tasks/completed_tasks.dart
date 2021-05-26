@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todolist/models/todoList.dart';
 
 class CompletedTasks extends StatelessWidget {
-  final TodoListModel todoList;
+  final TodoListModel? todoList;
 
   CompletedTasks({this.todoList});
 
@@ -13,10 +13,10 @@ class CompletedTasks extends StatelessWidget {
           title: Text('Completed Items'),
         ),
         body: ListView(
-            children: todoList.getCompletedTasks().map((t) {
+            children: todoList!.getCompletedTasks().map((t) {
           return Container(
             height: 50,
-            child: Center(child: Text(t.text, style: TextStyle(fontSize: 20))));
+            child: Center(child: Text(t.text!, style: TextStyle(fontSize: 20))));
         }).toList()));
   }
 }
