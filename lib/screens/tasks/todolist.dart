@@ -19,7 +19,7 @@ class TodoListWidget extends StatelessWidget {
         );
       })),
       Consumer<TodoListModel>(
-        builder: (contexst, tasks, child) {
+        builder: (context, tasks, child) {
           return TextField(
             controller: _controller,
             decoration: InputDecoration(
@@ -27,7 +27,9 @@ class TodoListWidget extends StatelessWidget {
                     borderSide: BorderSide(color: Colors.teal)),
                 labelText: 'new task'),
             onSubmitted: (newTask) {
-              tasks.addTaks(TaskModel(text: newTask)); // create new instance of task changeNotifier model
+              tasks.addTaks(TaskModel(
+                  text:
+                      newTask)); // create new instance of task changeNotifier model
               _controller.clear(); // clear the text input after adding taks
               tasks.saveTasksToSharedPrefs();
             },

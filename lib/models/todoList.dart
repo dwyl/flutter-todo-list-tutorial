@@ -25,4 +25,8 @@ class TodoListModel extends ChangeNotifier {
     final json = jsonEncode(tasks);
     prefs.setString('tasks', json);
   }
+
+  List<TaskModel> getCompletedTasks() {
+    return tasks.where((t) => t.completed == true).toList();
+  }
 }
