@@ -16,7 +16,7 @@ class CompletedTasks extends StatelessWidget {
             children: todoList!.getCompletedTasks().map((t) {
           return Container(
             height: 50,
-            child: Center(child: Text(t.text!, style: TextStyle(fontSize: 20))));
+            child: Center(child: Text(t.text, style: TextStyle(fontSize: 20))));
         }).toList()));
   }
 }

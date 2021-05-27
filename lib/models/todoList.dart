@@ -4,10 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class TodoListModel extends ChangeNotifier {
-  List<TaskModel>? tasks = [];
+  List<TaskModel> tasks = [];
 
   void addTaks(TaskModel task) {
-    tasks!.add(task);
+    tasks.add(task);
     notifyListeners();
   }
 
@@ -27,6 +27,6 @@ class TodoListModel extends ChangeNotifier {
   }
 
   List<TaskModel> getCompletedTasks() {
-    return tasks!.where((t) => t.completed == true).toList();
+    return tasks.where((t) => t.completed == true).toList();
   }
 }

@@ -20,7 +20,7 @@ class TaskWidget extends StatelessWidget {
     return Consumer<TaskModel>(builder: (context, task, child) {
       return CheckboxListTile(
         title: Text(
-          task.text!,
+          task.text,
           style: _taskStyle(task.completed),
         ),
         value: task.completed,
