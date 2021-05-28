@@ -1,10 +1,10 @@
-import 'package:provider/provider.dart';
-import 'package:todolist/models/todoList.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todolist/screens/completed_tasks/completed_tasks.dart';
 import 'package:todolist/screens/tasks/todolist.dart';
 import 'package:flutter/material.dart';
+import 'package:todolist/screens/tasks/providers.dart';
 
-class Tasks extends StatelessWidget {
+class Tasks extends ConsumerWidget {
   // display completed tasks screen
   void _goToCompletedTasks(context, todoList) {
     Navigator.push(
@@ -14,11 +14,10 @@ class Tasks extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
-    // get tasks from shared preferences
-    final TodoListModel todoList = TodoListModel();
-    // getTasksFromSharedPrefs call notifyListeners
-    todoList.getTasksFromSharedPrefs();
+  Widget build(BuildContext context, ScopedReader watch) {
+    final todolist = watch(todolistProvider);
+    // read the provider and call getTasksFromSharedPrefs()
+    todolist.getTasksFromSharedPrefs();
 
     return Scaffold(
         appBar: AppBar(
@@ -27,13 +26,12 @@ class Tasks extends StatelessWidget {
             Padding(
                 padding: EdgeInsets.only(right: 20.0),
                 child: IconButton(
-                    icon: Icon(Icons.check),
-                    onPressed: () => _goToCompletedTasks(context, todoList)))
+                  icon: Icon(Icons.check),
+                  onPressed: () {},
+                ))
+            //onPressed: () => _goToCompletedTasks(context, todoList)))
           ],
         ),
-        body: ChangeNotifierProvider.value(
-          value: todoList,
-          child: TodoListWidget(),
-        ));
+        body: TodoListWidget());
   }
 }

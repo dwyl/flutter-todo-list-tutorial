@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todolist/models/todoList.dart';
 
 class CompletedTasks extends StatelessWidget {
-  final TodoListModel? todoList;
+  final TodoListChangeNotifier? todoList;
 
   CompletedTasks({this.todoList});
 

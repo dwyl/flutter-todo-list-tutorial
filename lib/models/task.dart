@@ -6,7 +6,7 @@ class TaskModel extends ChangeNotifier {
   final String text;
   bool completed;
 
-  TaskModel({this.text = "", this.completed = false});
+  TaskModel({required this.text, this.completed = false});
 
   TaskModel.fromJson(Map<String, dynamic> json)
       : text = json['text'],
