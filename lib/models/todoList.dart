@@ -3,7 +3,7 @@ import 'package:todolist/models/task.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-class TodoListModel extends ChangeNotifier {
+class TodoListChangeNotifier extends ChangeNotifier {
   List<TaskModel> tasks = [];
 
   void addTaks(TaskModel task) {

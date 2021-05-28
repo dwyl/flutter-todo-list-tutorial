@@ -34,13 +34,13 @@ void main() {
     expect(task.completed, false);
 
     Text textWidgetBeforeTap = tester.widget(textTask) as Text;
-    expect(textWidgetBeforeTap.style.decoration, TextDecoration.none);
+    expect(textWidgetBeforeTap.style!.decoration, TextDecoration.none);
     await tester.tap(checkboxListTile);
 
     // rebuilt widget after tap action
     await tester.pumpAndSettle();
     expect(task.completed, true);
     Text textWidgetAfterTap = tester.widget(textTask) as Text;
-    expect(textWidgetAfterTap.style.decoration, TextDecoration.lineThrough);
+    expect(textWidgetAfterTap.style!.decoration, TextDecoration.lineThrough);
   });
 }

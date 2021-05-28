@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/models/task.dart';
-import 'package:provider/provider.dart';
 import 'package:todolist/models/todoList.dart';
 
 class TaskWidget extends StatelessWidget {
@@ -17,20 +16,18 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskModel>(builder: (context, task, child) {
-      return CheckboxListTile(
-        title: Text(
-          task.text,
-          style: _taskStyle(task.completed),
-        ),
-        value: task.completed,
-        onChanged: (newValue) {
-          task.toggle();
-          Provider.of<TodoListModel>(context, listen: false)
-              .saveTasksToSharedPrefs();
-        },
-        controlAffinity: ListTileControlAffinity.leading,
-      );
-    });
+    return CheckboxListTile(
+      title: Text('task text',
+          //task.text,
+          style: _taskStyle(false) // task.completed),
+          ),
+      value: false, //task.completed,
+      onChanged: (newValue) {
+        //task.toggle();
+        // Provider.of<TodoListChangeNotifier>(context, listen: false)
+        //    .saveTasksToSharedPrefs();
+      },
+      controlAffinity: ListTileControlAffinity.leading,
+    );
   }
 }

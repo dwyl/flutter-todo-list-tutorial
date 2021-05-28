@@ -41,7 +41,7 @@ void main() {
     // enter text in field
     await tester.enterText(textField, 'task 1');
     final textFieldWidget = tester.widget(textField) as TextField;
-    textFieldWidget.onSubmitted(textFieldWidget.controller.value.text);
+    textFieldWidget.onSubmitted!(textFieldWidget.controller!.value.text);
     await tester.pumpAndSettle();
     await tester.pumpAndSettle();
 
