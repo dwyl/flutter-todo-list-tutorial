@@ -14,8 +14,8 @@ class Tasks extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final todolist = watch(todolistProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todolist = ref.watch(todolistProvider);
     // read the provider and call getTasksFromSharedPrefs()
     todolist.getTasksFromSharedPrefs();
 

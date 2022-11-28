@@ -9,8 +9,8 @@ class TodoListWidget extends ConsumerWidget {
   final TextEditingController _controller = TextEditingController();
 
   @override
-  Widget build(BuildContext context, ScopedReader watch) {
-    final _tasks = watch(todolistProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _tasks = ref.watch(todolistProvider);
     List<Widget> taskWidget = 
           _tasks.tasks.map((task) {
             return TaskWidget();
