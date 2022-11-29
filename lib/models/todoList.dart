@@ -11,6 +11,11 @@ class TodoListChangeNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateTask(TaskModel newTask, int taskIndex) {
+    tasks[taskIndex] = newTask;
+    notifyListeners();
+  }
+
   Future<void> getTasksFromSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final tasksJson = prefs.getString('tasks') ?? '[]';

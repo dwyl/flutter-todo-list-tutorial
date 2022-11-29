@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todolist/models/task.dart';
 import 'package:todolist/models/todoList.dart';
+import 'package:todolist/screens/tasks/providers.dart';
 
-class TaskWidget extends StatelessWidget {
+class TaskWidget extends ConsumerWidget {
+  TaskWidget(TaskModel this.task, int this.taskIndex);
+
+  TaskModel task;
+  int taskIndex;
+
   // method to style completed/uncompleted item
   TextStyle _taskStyle(completed) {
     if (completed)
@@ -15,17 +22,15 @@ class TaskWidget extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final _tasks = ref.watch(todolistProvider);
+
     return CheckboxListTile(
-      title: Text('task text',
-          //task.text,
-          style: _taskStyle(false) // task.completed),
-          ),
-      value: false, //task.completed,
+      title: Text(this.task.text, style: _taskStyle(this.task.completed)),
+      value: this.task.completed,
       onChanged: (newValue) {
-        //task.toggle();
-        // Provider.of<TodoListChangeNotifier>(context, listen: false)
-        //    .saveTasksToSharedPrefs();
+        this.task.toggle();
+        _tasks.updateTask(this.task, this.taskIndex);
       },
       controlAffinity: ListTileControlAffinity.leading,
     );

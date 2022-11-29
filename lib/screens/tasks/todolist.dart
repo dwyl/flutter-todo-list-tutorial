@@ -11,23 +11,38 @@ class TodoListWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final _tasks = ref.watch(todolistProvider);
-    List<Widget> taskWidget = _tasks.tasks.map((task) {
-      return TaskWidget();
+
+    List<Widget> taskWidgets = _tasks.tasks.asMap().entries.map((entry) {
+      return TaskWidget(entry.value, entry.key);
     }).toList();
 
     return Column(children: [
-      Expanded(child: ListView(children: taskWidget)),
+      Expanded(child: ListView(children: taskWidgets)),
       Consumer(
         builder: (context, tasks, child) {
           return TextField(
-            controller: _controller,
-            decoration: InputDecoration(border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)), labelText: 'new task'),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Add task',
+            ),
             onSubmitted: (newTask) {
               _tasks.addTask(TaskModel(text: newTask)); // create new instan`ce of task changeNotifier model
               _controller.clear(); // clear the text input after adding taks
               _tasks.saveTasksToSharedPrefs();
             },
           );
+          /*
+          return TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(borderSide: BorderSide(color: Colors.teal)), labelText: 'new task'),
+            onSubmitted: (newTask) {
+              _tasks.addTask(TaskModel(text: newTask)); // create new instan`ce of task changeNotifier model
+              _controller.clear(); // clear the text input after adding taks
+              _tasks.saveTasksToSharedPrefs();
+            },
+          );
+          */
         },
       )
     ]);
