@@ -1,40 +1,81 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:todolist/models/task.dart';
 import 'package:todolist/models/todoList.dart';
+import 'package:todolist/screens/tasks/providers.dart';
+import 'package:todolist/screens/tasks/task.dart';
+import 'package:todolist/screens/tasks/tasks.dart';
 import 'package:todolist/screens/tasks/todolist.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   testWidgets('Test Todolist widget', (WidgetTester tester) async {
-    final todoList = TodoListModel();
-    final task = TaskModel(text: "task 1");
+    final todoList = TodoListChangeNotifier();
+    final task1 = TaskModel(text: "task 1");
     final task2 = TaskModel(text: "task 2");
     final task3 = TaskModel(text: "task 3");
-    todoList.addTaks(task);
-    todoList.addTaks(task2);
-    todoList.addTaks(task3);
-    await tester.pumpWidget(
-      MaterialApp(
-          home: ChangeNotifierProvider<TodoListModel>.value(
-              value: todoList, child: Scaffold(body: TodoListWidget()))),
-    );
 
-    final textTask1 = find.text('task 1');
-    final textTask2 = find.text('task 2');
-    final textTask3 = find.text('task 3');
-    expect(textTask1, findsOneWidget);
-    expect(textTask2, findsOneWidget);
-    expect(textTask3, findsOneWidget);
+    todoList.addTask(task1);
+    todoList.addTask(task2);
+    todoList.addTask(task3);
+
+    // Localizations, Directionality and Media Query are needed for the widget to be tested
+    Widget testWidget = Localizations(
+        locale: const Locale('en', 'US'),
+        delegates: const <LocalizationsDelegate<dynamic>>[
+          DefaultWidgetsLocalizations.delegate,
+          DefaultMaterialLocalizations.delegate,
+        ],
+        child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: MediaQuery(
+                data: new MediaQueryData(),
+                child: Material(
+                    child: ProviderScope(
+                        overrides: [
+                      todolistProvider.overrideWith((ref) {
+                        return todoList;
+                      })
+                    ],
+                        // Our application, which will read from todoListProvider to display the todo-list.
+                        // You may extract this into a MyApp widget
+                        child: Scaffold(body: TodoListWidget()))))));
+
+    await tester.pumpWidget(testWidget);
+    await tester.pumpAndSettle();
+
+    final tasks = find.byType(TaskWidget);
+    expect(tasks, findsAtLeastNWidgets(3));
   });
 
   testWidgets('Add a new task', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-          home: ChangeNotifierProvider<TodoListModel>(
-              create: (_) => TodoListModel(),
-              child: Scaffold(body: TodoListWidget()))),
-    );
+    final todoList = TodoListChangeNotifier();
+
+    // Localizations, Directionality and Media Query are needed for the widget to be tested
+    Widget testWidget = Localizations(
+        locale: const Locale('en', 'US'),
+        delegates: const <LocalizationsDelegate<dynamic>>[
+          DefaultWidgetsLocalizations.delegate,
+          DefaultMaterialLocalizations.delegate,
+        ],
+        child: MediaQuery(
+            data: new MediaQueryData(),
+            child: Material(
+                child: ProviderScope(
+                    overrides: [
+                  todolistProvider.overrideWith((ref) {
+                    return todoList;
+                  })
+                ],
+                    // Our application, which will read from todoListProvider to display the todo-list.
+                    // You may extract this into a MyApp widget
+                    child: Scaffold(body: TodoListWidget())))));
+
+
+
+    await tester.pumpWidget(testWidget);
+    await tester.pumpAndSettle();
+
     final textField = find.byType(TextField);
     expect(textField, findsOneWidget);
 

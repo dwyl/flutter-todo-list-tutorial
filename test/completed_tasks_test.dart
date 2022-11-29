@@ -6,7 +6,7 @@ import 'package:todolist/screens/completed_tasks/completed_tasks.dart';
 
 void main() {
   testWidgets('Test Todolist widget', (WidgetTester tester) async {
-    final todoList = TodoListModel();
+    final todoList = [];
     final task = TaskModel(text: "task 1");
     final task2 = TaskModel(text: "task 2");
     final task3 = TaskModel(text: "task 3", completed: true);
@@ -14,9 +14,7 @@ void main() {
     todoList.addTaks(task2);
     todoList.addTaks(task3);
     await tester.pumpWidget(
-      MaterialApp(
-          home: CompletedTasks(todoList: todoList )
-          ),
+      MaterialApp(home: CompletedTasks(todoList: todoList)),
     );
 
     final textTask1 = find.text('task 1');

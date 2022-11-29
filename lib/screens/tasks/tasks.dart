@@ -27,9 +27,8 @@ class Tasks extends ConsumerWidget {
                 padding: EdgeInsets.only(right: 20.0),
                 child: IconButton(
                   icon: Icon(Icons.check),
-                  onPressed: () {},
+                  onPressed: () => _goToCompletedTasks(context, todolist),
                 ))
-            //onPressed: () => _goToCompletedTasks(context, todoList)))
           ],
         ),
         body: TodoListWidget());

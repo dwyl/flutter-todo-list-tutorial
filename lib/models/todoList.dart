@@ -6,7 +6,7 @@ import 'dart:convert';
 class TodoListChangeNotifier extends ChangeNotifier {
   List<TaskModel> tasks = [];
 
-  void addTaks(TaskModel task) {
+  void addTask(TaskModel task) {
     tasks.add(task);
     notifyListeners();
   }
