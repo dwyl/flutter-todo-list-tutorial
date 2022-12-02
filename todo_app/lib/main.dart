@@ -2,75 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import 'providers.dart';
 import 'todo.dart';
 
 /// Some keys used for testing
+final bottomNavigationBarKey = UniqueKey();
 final addTodoKey = UniqueKey();
 final activeFilterKey = UniqueKey();
 final completedFilterKey = UniqueKey();
 final allFilterKey = UniqueKey();
 
-/// Creates a [TodoList] and initialise it with pre-defined values.
-///
-/// We are using [StateNotifierProvider] here as a `List<Todo>` is a complex
-/// object, with advanced business logic like how to edit a todo.
-final todoListProvider = StateNotifierProvider<TodoList, List<Todo>>((ref) {
-  return TodoList(const [
-    Todo(id: 'todo-0', description: 'hi'),
-    Todo(id: 'todo-1', description: 'hello'),
-    Todo(id: 'todo-2', description: 'bonjour'),
-  ]);
-});
-
-/// The different ways to filter the list of todos
-enum TodoListFilter {
-  all,
-  active,
-  completed,
-}
-
-/// The currently active filter.
-///
-/// We use [StateProvider] here as there is no fancy logic behind manipulating
-/// the value since it's just enum.
-final todoListFilter = StateProvider((_) => TodoListFilter.all);
-
-/// The number of uncompleted todos
-///
-/// By using [Provider], this value is cached, making it performant.\
-/// Even multiple widgets try to read the number of uncompleted todos,
-/// the value will be computed only once (until the todo-list changes).
-///
-/// This will also optimise unneeded rebuilds if the todo-list changes, but the
-/// number of uncompleted todos doesn't (such as when editing a todo).
-final uncompletedTodosCount = Provider<int>((ref) {
-  return ref.watch(todoListProvider).where((todo) => !todo.completed).length;
-});
-
-/// The list of todos after applying of [todoListFilter].
-///
-/// This too uses [Provider], to avoid recomputing the filtered list unless either
-/// the filter of or the todo-list updates.
-final filteredTodos = Provider<List<Todo>>((ref) {
-  final filter = ref.watch(todoListFilter);
-  final todos = ref.watch(todoListProvider);
-
-  switch (filter) {
-    case TodoListFilter.completed:
-      return todos.where((todo) => todo.completed).toList();
-    case TodoListFilter.active:
-      return todos.where((todo) => !todo.completed).toList();
-    case TodoListFilter.all:
-      return todos;
-  }
-});
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(const ProviderScope(child: App()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class App extends StatelessWidget {
+  const App({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +42,6 @@ class Home extends HookConsumerWidget {
         body: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
           children: [
-            const Title(),
             TextField(
               key: addTodoKey,
               controller: newTodoController,
@@ -107,7 +54,7 @@ class Home extends HookConsumerWidget {
               },
             ),
             const SizedBox(height: 42),
-            const Toolbar(),
+            Text('${ref.watch(uncompletedTodosCount)} items left'),
             if (todos.isNotEmpty) const Divider(height: 0),
             for (var i = 0; i < todos.length; i++) ...[
               if (i > 0) const Divider(height: 0),
@@ -126,13 +73,14 @@ class Home extends HookConsumerWidget {
             ],
           ],
         ),
+        bottomNavigationBar: const Menu(),
       ),
     );
   }
 }
 
-class Toolbar extends HookConsumerWidget {
-  const Toolbar({
+class Menu extends HookConsumerWidget {
+  const Menu({
     Key? key,
   }) : super(key: key);
 
@@ -140,95 +88,53 @@ class Toolbar extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(todoListFilter);
 
-    Color? textColorFor(TodoListFilter value) {
-      return filter == value ? Colors.blue : Colors.black;
+    int currentIndex() {
+      switch (filter) {
+        case TodoListFilter.completed:
+          return 2;
+        case TodoListFilter.active:
+          return 1;
+        case TodoListFilter.all:
+          return 0;
+      }
     }
 
-    return Material(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              '${ref.watch(uncompletedTodosCount)} items left',
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Tooltip(
-            key: allFilterKey,
-            message: 'All todos',
-            child: TextButton(
-              onPressed: () =>
-                  ref.read(todoListFilter.notifier).state = TodoListFilter.all,
-              style: ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                foregroundColor:
-                    MaterialStateProperty.all(textColorFor(TodoListFilter.all)),
-              ),
-              child: const Text('All'),
-            ),
-          ),
-          Tooltip(
-            key: activeFilterKey,
-            message: 'Only uncompleted todos',
-            child: TextButton(
-              onPressed: () => ref.read(todoListFilter.notifier).state =
-                  TodoListFilter.active,
-              style: ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                foregroundColor: MaterialStateProperty.all(
-                  textColorFor(TodoListFilter.active),
-                ),
-              ),
-              child: const Text('Active'),
-            ),
-          ),
-          Tooltip(
-            key: completedFilterKey,
-            message: 'Only completed todos',
-            child: TextButton(
-              onPressed: () => ref.read(todoListFilter.notifier).state =
-                  TodoListFilter.completed,
-              style: ButtonStyle(
-                visualDensity: VisualDensity.compact,
-                foregroundColor: MaterialStateProperty.all(
-                  textColorFor(TodoListFilter.completed),
-                ),
-              ),
-              child: const Text('Completed'),
-            ),
-          ),
-        ],
-      ),
+    return BottomNavigationBar(
+      key: bottomNavigationBarKey,
+      elevation: 0.0,
+      onTap: (value) {
+        if (value == 0) ref.read(todoListFilter.notifier).state = TodoListFilter.all;
+        if (value == 1) ref.read(todoListFilter.notifier).state = TodoListFilter.active;
+        if (value == 2) ref.read(todoListFilter.notifier).state = TodoListFilter.completed;
+      },
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.list),
+          label: 'All',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.circle),
+          label: 'Active',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.done),
+          label: 'Completed',
+        ),
+      ],
+      currentIndex: currentIndex(),
+      selectedItemColor: Colors.amber[800],
     );
   }
 }
 
-class Title extends StatelessWidget {
-  const Title({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Text(
-      'todos',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: Color.fromARGB(38, 47, 47, 247),
-        fontSize: 100,
-        fontWeight: FontWeight.w100,
-        fontFamily: 'Helvetica Neue',
-      ),
-    );
-  }
-}
 
 /// A provider which exposes the [Todo] displayed by a [TodoItem].
 ///
 /// By retrieving the [Todo] through a provider instead of through its
 /// constructor, this allows [TodoItem] to be instantiated using the `const` keyword.
 ///
-/// This ensures that when we add/remove/edit todos, only what the
-/// impacted widgets rebuilds, instead of the entire list of items.
+/// This encapuslation ensures that when adding/removing/editing todos, 
+/// only what the impacted widgets rebuilds, instead of the entire list of items.
 final _currentTodo = Provider<Todo>((ref) => throw UnimplementedError());
 
 class TodoItem extends HookConsumerWidget {
@@ -253,9 +159,7 @@ class TodoItem extends HookConsumerWidget {
             textEditingController.text = todo.description;
           } else {
             // Commit changes only when the textfield is unfocused, for performance
-            ref
-                .read(todoListProvider.notifier)
-                .edit(id: todo.id, description: textEditingController.text);
+            ref.read(todoListProvider.notifier).edit(id: todo.id, description: textEditingController.text);
           }
         },
         child: ListTile(
@@ -265,8 +169,7 @@ class TodoItem extends HookConsumerWidget {
           },
           leading: Checkbox(
             value: todo.completed,
-            onChanged: (value) =>
-                ref.read(todoListProvider.notifier).toggle(todo.id),
+            onChanged: (value) => ref.read(todoListProvider.notifier).toggle(todo.id),
           ),
           title: itemIsFocused
               ? TextField(
