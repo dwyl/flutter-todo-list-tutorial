@@ -5,17 +5,15 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'providers.dart';
 import 'todo.dart';
 
-/// Some keys used for testing
+/// Keys for components for testing
 final bottomNavigationBarKey = UniqueKey();
 final addTodoKey = UniqueKey();
-final activeFilterKey = UniqueKey();
-final completedFilterKey = UniqueKey();
-final allFilterKey = UniqueKey();
 
-
+// coverage:ignore-start
 void main() {
   runApp(const ProviderScope(child: App()));
 }
+// coverage:ignore-end
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -85,9 +83,7 @@ class Home extends HookConsumerWidget {
 
 /// Bottom menu widget
 class Menu extends HookConsumerWidget {
-  const Menu({
-    Key? key,
-  }) : super(key: key);
+  const Menu({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -116,14 +112,17 @@ class Menu extends HookConsumerWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.list),
           label: 'All',
+          tooltip: 'All'
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.circle),
           label: 'Active',
+          tooltip: 'Active',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.done),
           label: 'Completed',
+          tooltip: 'Completed',
         ),
       ],
       currentIndex: currentIndex(),

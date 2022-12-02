@@ -17,11 +17,6 @@ class Todo {
   final String id;
   final String description;
   final bool completed;
-
-  @override
-  String toString() {
-    return 'Todo $id: description: $description, completed: $completed';
-  }
 }
 
 /// An object that controls a list of [Todo].
@@ -75,10 +70,5 @@ class TodoList extends StateNotifier<List<Todo>> {
     }
 
     state = newState;
-  }
-
-  // Removes `todo` item from list
-  void remove(Todo target) {
-    state = state.where((todo) => todo.id != target.id).toList();
   }
 }
