@@ -181,6 +181,221 @@ fetch the dependencies.
 We now have everything we need
 to start developing!
 
-# 2. Creating `Todo` class
+# 2. Creating `Todo` class and `TodoList`
 
+Since we are dealing with
+`Todo` items in this app,
+let's start by doing that.
+Let's create a file in
+`lib/todo.dart` 
+and add the following piece of code.
+
+```dart
+import 'package:flutter/foundation.dart' show immutable;
+import 'package:riverpod/riverpod.dart';
+import 'package:uuid/uuid.dart';
+
+@immutable
+class Todo {
+  const Todo({
+    required this.description,
+    required this.id,
+    this.completed = false,
+  });
+
+  final String id;
+  final String description;
+  final bool completed;
+}
+```
+
+We just created our `Todo` model class.
+Each `todo` item has an `id`, a `description`
+and a boolean `completed` field
+that toggles between the `todo` item being
+done or not.
+Pretty simple, right? 😉
+
+You might have noticed there is an
+`@immutable` annotation being used 
+for this class.
+This is directly related to **code-generation**.
+You might have noticed the `build_runner` 
+dependency we added earlier. 
+This is the tool that will generate code for us.
+In short, code generation allows us to
+work with `Riverpod` with a friendlier syntax
+and reduce boilerplate code.
+If you want to learn more about 
+code generation in `Riverpod` 
+and how it is useful, 
+check the follow link ->
+https://docs-v2.riverpod.dev/docs/about_code_generation
+
+Let's move on.
+We are going to be storing our `todo` items
+in a **list** - `TodoList`.
+We want this list to be *accessible*
+anywhere within the widget tree.
+But before that, 
+let's clear some concepts.
+
+### 2.1 - `Riverpod` Provider
+When using `Riverpod`,
+you are going to see the word **"Provider"** 
+tossed around a lot. And for good reason,
+because it's important!
+**A provider is an object that encapsulates
+ a piece of state and allows listening to that state.**.
+
+ By wrapping a piece of state in a `provider`,
+ you will make it so that:
+ - it is acessible from multiple locations within
+ the widget tree.
+ - enable performance optimizations, 
+ like caching the value.
+ - increase testability of your application.
+ - among others...
+
+ We have acess to 
+ [different types of providers](https://docs-v2.riverpod.dev/docs/concepts/providers#different-types-of-providers)
+ that are suitable for different use cases.
+ In our application,
+ we are going to be using `Provider`,
+ `StateProvider` and `StateNotifierProvider`.
+ We are going to get to these when we implement them.
+ 😉
+ > If you want to learn more
+ > about Providers, 
+ > check the official docs -> 
+ > https://docs-v2.riverpod.dev/docs/concepts/providers/
+
+## 2.2 - Adding `TodoList` using the `StateNotifierProvider`
+
+Now that we know a bit about
+what a `Provider` is,
+let's start using one. 
+Don't worry if you are still confused,
+you will see how it works!
+Let's create our `TodoList`.
+In the `lib/todo.dart` file,
+add the following code.
+
+```dart
+const _uuid = Uuid();
+
+class TodoList extends StateNotifier<List<Todo>> {
+  TodoList([List<Todo>? initialTodos]) : super(initialTodos ?? []);
+
+  /// Adds `todo` item to list.
+  void add(String description) {
+    // Since our state is immutable, we are not allowed to do `state.add(todo)`.
+    state = [
+      ...state,
+      Todo(
+        id: _uuid.v4(),
+        description: description,
+      ),
+    ];
+  }
+
+  /// Toggles `todo` item between completed or not completed.
+  void toggle(String id) {
+    final newState = [...state];
+    final todoToReplaceIndex = state.indexWhere((todo) => todo.id == id);
+
+    if (todoToReplaceIndex != -1) {
+      newState[todoToReplaceIndex] = Todo(
+        id: newState[todoToReplaceIndex].id,
+        completed: !newState[todoToReplaceIndex].completed,
+        description: newState[todoToReplaceIndex].description,
+      );
+    }
+
+    state = newState;
+  }
+
+  /// Edits a `todo` item.
+  void edit({required String id, required String description}) {
+    final newState = [...state];
+    final todoToReplaceIndex = state.indexWhere((todo) => todo.id == id);
+
+    if (todoToReplaceIndex != -1) {
+      newState[todoToReplaceIndex] = Todo(
+        id: newState[todoToReplaceIndex].id,
+        completed: !newState[todoToReplaceIndex].completed,
+        description: description,
+      );
+    }
+
+    state = newState;
+  }
+}
+```
+
+It's breakdown time! 🎉
+The first thing we notice is that
+`TodoList` is *extending*
+`StateNotifier<List<Todo>>`. 
+**We are using a 
+[`StateNotifierProvider`](https://docs-v2.riverpod.dev/docs/providers/state_notifier_provider)**!
+
+> `StateNotifierProvider` is a provider 
+> that is used to listen to and expose a `StateNotifier`.
+> `StateNotifierProvider` along with `StateNotifier` 
+> is Riverpod's recommended solution 
+> for managing *immutable* state 
+> which may change in reaction to a user interaction.
+> 
+>  https://docs-v2.riverpod.dev/docs/providers/state_notifier_provider
+
+Let's dissect this.
+We are using `StateNotifierProvider`
+because it fits our use case.
+Our list of `todos` are going to 
+change according to what the user does:
+we will add a `todo` item if he creates one
+and update a `todo` item if he decides
+to edit one.
+If he marks a `todo` item as completed,
+we need to update that in our `todolist`.
+
+In the code above, we are using `StateNotifier`,
+which is what `StateNotifierProvider` will expose
+to the widgets. 
+Think of `StateNotifier` as *an object* that is
+going to change over time.
+
+Inside the `TodoList` class,
+we define **three methods**:
+one that `add`s a todo to the list;
+one that `toggle`s a todo item inside the list;
+and one that `edits` a todo item inside the list
+(e.g. update the description).
+**Notice that we are not changing the object
+in these functions**. 
+We are creating **copies** of the state,
+changing the copy and assigning it to the state.
+
+That makes sense, right?
+
+So, in the `add` function, 
+we add a `todo` item to the list
+and use the `uuid` package 
+to create an `id` to the newly created item.
+
+In the `toggle` function, 
+we find the `todo` item we want
+to mark as completed/uncompleted
+and update it.
+
+In the `edit` function 
+we do something similar,
+except we change the description
+of the todo item.
+
+Again, in all of these methods
+we don't *change* the list. 
+We create a new updated one
+(because the state is **immutable**).
 
