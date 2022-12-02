@@ -240,7 +240,8 @@ anywhere within the widget tree.
 But before that, 
 let's clear some concepts.
 
-### 2.1 - `Riverpod` Provider
+### 2.1. `Riverpod` Provider
+
 When using `Riverpod`,
 you are going to see the word **"Provider"** 
 tossed around a lot. And for good reason,
@@ -270,7 +271,7 @@ because it's important!
  > check the official docs -> 
  > https://docs-v2.riverpod.dev/docs/concepts/providers/
 
-## 2.2 - Adding `TodoList` using the `StateNotifierProvider`
+## 2.2.Adding `TodoList` using the `StateNotifierProvider`
 
 Now that we know a bit about
 what a `Provider` is,
@@ -399,3 +400,149 @@ we don't *change* the list.
 We create a new updated one
 (because the state is **immutable**).
 
+## 3. Adding providers
+
+Now that we added
+the blocks to create our `provider`s,
+let's do that!
+
+In a new file `lib/providers.dart`,
+add the following code.
+
+```dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:todo_app/todo.dart';
+
+final todoListProvider = StateNotifierProvider<TodoList, List<Todo>>((ref) {
+  return TodoList(const [
+    Todo(id: '0', description: 'hey there :)'),
+  ]);
+});
+```
+
+We have stated before that 
+we were going to be using `StateNotifierProvider`
+to hold the `TodoList` so it could be shared
+everywhere in the application.
+But `StateNotifierProvider` exposes
+`StateNotifier` object, 
+which we already created (it is our `TodoList`).
+Now here we are just creating it
+and exposing it ☺️. 
+In this case, 
+we are creating a `TodoList`
+with a single `todo` item by default.
+
+### 3.1 - Filtering the `TodoList`
+
+We want to be able to check
+**all** the `todo` items,
+the **active** ones (created but not completed)
+and the **completed** ones.
+
+For that, the application 
+is going to need to be able
+to *filter* the `TodoList` 
+and know what the *current filter*
+is currently being on
+(if the screen is showing `all`,
+or `completed` or `active` items).
+Let's do this.
+Add the following code to the same
+`lib/providers.dart` file.
+
+```dart
+/// Enum with possible filters of the `todo` list.
+enum TodoListFilter {
+  all,
+  active,
+  completed,
+}
+
+/// The currently active filter.
+final todoListFilter = StateProvider((_) => TodoListFilter.all);
+
+/// The list of todos after applying a [todoListFilter].
+final filteredTodos = Provider<List<Todo>>((ref) {
+  final filter = ref.watch(todoListFilter);
+  final todos = ref.watch(todoListProvider);
+
+  switch (filter) {
+    case TodoListFilter.completed:
+      return todos.where((todo) => todo.completed).toList();
+    case TodoListFilter.active:
+      return todos.where((todo) => !todo.completed).toList();
+    case TodoListFilter.all:
+      return todos;
+  }
+});
+```
+
+We are firstly defining an `enum` with
+all the possible filters. 
+We added three: `all`, `active` and `completed`.
+
+The `todoListFilter` refers to the
+*currently active filter* that
+is shown on screen.
+For this we are using the 
+[`State Provider`](https://docs-v2.riverpod.dev/docs/providers/state_provider)
+provider type.
+This provider type is actually a much
+*simpler* `StateNotifierProvider`. 
+We don't need to create a `StateNotifier` object
+like we did before, 
+so it's meant for very simple use-cases.
+Just like this one!
+We just want to know the value of the
+current filter, and that is it!
+
+
+The `filteredTodos` will
+return the `TodoList` filtered according
+to a specific filter.
+If the `all` filter is applied, 
+we just show all the `todo` items.
+If the `completed` filter is applied,
+we return the `TodoList` with only
+the *completed* todo items.
+It uses the 
+[`Provider`](https://docs-v2.riverpod.dev/docs/providers/provider)
+type provider - which is the most basic
+of all of them.
+It just creates a value -
+in this case, an array of `todo` items.
+It's useful this value (the `todo` items 
+that is returned by this provider) 
+only rebuilds whenever we want it to update.
+So, in this case, it only updates when
+`todoListFilter` (the current filter)
+and `todoListProvider` (the list of `todo` items)
+change.
+Hence why these lines exist.
+
+```dart
+final filter = ref.watch(todoListFilter);
+final todos = ref.watch(todoListProvider);
+```
+
+### 3.2. Showing how many `todo` items are left
+
+We also want the user to know
+how many `todo` items are still
+left to be completed.
+
+For this, add the following code.
+
+```dart
+final uncompletedTodosCount = Provider<int>((ref) {
+  return ref.watch(todoListProvider).where((todo) => !todo.completed).length;
+});
+```
+
+Similarly to what we did before,
+we are using the `Provider`
+type of provider.
+`uncompletedTodosCount` is
+only recomputated when
+`todoListProvider` changes.
