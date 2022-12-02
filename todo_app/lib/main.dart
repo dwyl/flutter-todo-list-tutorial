@@ -46,30 +46,34 @@ class Home extends HookConsumerWidget {
               key: addTodoKey,
               controller: newTodoController,
               decoration: const InputDecoration(
-                labelText: 'What needs to be done?',
+                labelText: 'What do we need to do?',
               ),
               onSubmitted: (value) {
                 ref.read(todoListProvider.notifier).add(value);
                 newTodoController.clear();
               },
             ),
+
             const SizedBox(height: 42),
-            Text('${ref.watch(uncompletedTodosCount)} items left'),
+            
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Text(
+                '${ref.watch(uncompletedTodosCount)} items left',
+                style: const TextStyle(fontSize: 20),),
+            ),
+
             if (todos.isNotEmpty) const Divider(height: 0),
             for (var i = 0; i < todos.length; i++) ...[
+
               if (i > 0) const Divider(height: 0),
-              Dismissible(
-                key: ValueKey(todos[i].id),
-                onDismissed: (_) {
-                  ref.read(todoListProvider.notifier).remove(todos[i]);
-                },
-                child: ProviderScope(
+              ProviderScope(
                   overrides: [
                     _currentTodo.overrideWithValue(todos[i]),
                   ],
                   child: const TodoItem(),
-                ),
-              )
+              ),
+
             ],
           ],
         ),
@@ -79,6 +83,7 @@ class Home extends HookConsumerWidget {
   }
 }
 
+/// Bottom menu widget
 class Menu extends HookConsumerWidget {
   const Menu({
     Key? key,
