@@ -47,7 +47,23 @@ https://github.com/dwyl/learn-dart
 
 https://github.com/dwyl/learn-flutter
 
+If you want a walkthrough on 
+*two* simpler applications,
+we highly recommend going through
+these in order so you can understand
+the ins and outs better.
 
+1. https://github.com/dwyl/flutter-counter-example
+2. https://github.com/dwyl/flutter-stopwatch-tutorial/pulls
+
+This tutorial will sacrifice some
+setup steps that are found in the aforementioned,
+so make sure to check these out if
+you feel like you are lost or 
+this is your first time using Flutter.
+
+
+Right! 
 Before building this app,
 let's check out the final result!
 After cloning this repository 
@@ -104,5 +120,67 @@ will look like.
 ![widgets-tree](https://user-images.githubusercontent.com/6057298/93343977-03d72380-f829-11ea-8c4b-dc964c591e97.png)
 
 ## 1. Project setup
+
+> In this walkthrough we are going to use Visual Studio Code. 
+> We will assume you have this IDE installed, 
+> as well as the Flutter and Dart extensions installed. 
+
+After restarting Visual Studio Code, 
+let's create a new project! 
+Click on `View > Command Palette`, 
+type `Flutter` and click on `Flutter: New Project`.
+It will ask you for a name of the new project.
+We are going to name it **"todo_app**".
+
+After generating the project, 
+let's now add all the needed
+dependencies.
+As it was stated before,
+we are going to be using
+`Riverpod` for state management and
+accessing shared data across the widget tree.
+Along side this library, 
+are going to also use 
+[`uuid`](https://pub.dev/packages/uuid)
+to generate `id`s for newly created todo items.
+Additionally, we are going to use
+`flutter_hooks` to make widget life-cycle management easier.
+
+Head over to `pubspec.yaml` file 
+and add the following dependencies.
+
+```yaml
+environment:
+  sdk: ">=2.17.0 <3.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  flutter_riverpod: ^2.0.2
+  riverpod_annotation: ^1.0.4
+  hooks_riverpod: ^2.1.1
+  flutter_hooks: ^0.18.5+1
+  uuid: ^3.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+  build_runner: ^2.3.2
+  riverpod_generator: ^1.0.4
+```
+
+After adding these, 
+run `flutter pub get` to 
+fetch the dependencies.
+
+We now have everything we need
+to start developing!
+
+# 2. Creating `Todo` class
 
 
