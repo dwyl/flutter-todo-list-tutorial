@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dwyl.todolist">
-    <application
+    package="com.example.todo_app">
+   <application
+        android:label="todo_app"
         android:name="${applicationName}"
-        android:label="todolist"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
