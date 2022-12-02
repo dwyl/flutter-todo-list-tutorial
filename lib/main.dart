@@ -58,7 +58,8 @@ class Home extends HookConsumerWidget {
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Text(
                 '${ref.watch(uncompletedTodosCount)} items left',
-                style: const TextStyle(fontSize: 20),),
+                style: const TextStyle(fontSize: 20)
+                ),
             ),
 
             if (todos.isNotEmpty) const Divider(height: 0),

@@ -61,6 +61,11 @@ setup steps that are found in the aforementioned,
 so make sure to check these out if
 you feel like you are lost or 
 this is your first time using Flutter.
+We will focus more on **shared state**
+and **data management** instead of 
+styling. So `Riverpod` and fetching
+data from API will get the spotlight here.
+🔦
 
 
 Right! 
@@ -546,3 +551,502 @@ type of provider.
 `uncompletedTodosCount` is
 only recomputated when
 `todoListProvider` changes.
+
+## 4. Creating the app
+
+Now that all the providers
+we need are set up,
+we just now need to create our app,
+style it to our liking 
+and access this shared state we just created
+accordingly!
+
+We will now add all the code
+needed for this to work and 
+we'll walk you through it 
+and explain it in sections.
+
+For now, let's add our code.
+In the `lib/main.dart` file,
+add the following.
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'providers.dart';
+import 'todo.dart';
+
+/// Keys for components for testing
+final bottomNavigationBarKey = UniqueKey();
+final addTodoKey = UniqueKey();
+
+// coverage:ignore-start
+void main() {
+  runApp(const ProviderScope(child: App()));
+}
+// coverage:ignore-end
+
+class App extends StatelessWidget {
+  const App({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Home(),
+    );
+  }
+}
+
+class Home extends HookConsumerWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todos = ref.watch(filteredTodos);
+    final newTodoController = useTextEditingController();
+
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        body: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+          children: [
+            TextField(
+              key: addTodoKey,
+              controller: newTodoController,
+              decoration: const InputDecoration(
+                labelText: 'What do we need to do?',
+              ),
+              onSubmitted: (value) {
+                ref.read(todoListProvider.notifier).add(value);
+                newTodoController.clear();
+              },
+            ),
+
+            const SizedBox(height: 42),
+            
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: Text(
+                '${ref.watch(uncompletedTodosCount)} items left',
+                style: const TextStyle(fontSize: 20),),
+            ),
+
+            if (todos.isNotEmpty) const Divider(height: 0),
+            for (var i = 0; i < todos.length; i++) ...[
+
+              if (i > 0) const Divider(height: 0),
+              ProviderScope(
+                  overrides: [
+                    _currentTodo.overrideWithValue(todos[i]),
+                  ],
+                  child: const TodoItem(),
+              ),
+
+            ],
+          ],
+        ),
+        bottomNavigationBar: const Menu(),
+      ),
+    );
+  }
+}
+
+/// Bottom menu widget
+class Menu extends HookConsumerWidget {
+  const Menu({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filter = ref.watch(todoListFilter);
+
+    int currentIndex() {
+      switch (filter) {
+        case TodoListFilter.completed:
+          return 2;
+        case TodoListFilter.active:
+          return 1;
+        case TodoListFilter.all:
+          return 0;
+      }
+    }
+
+    return BottomNavigationBar(
+      key: bottomNavigationBarKey,
+      elevation: 0.0,
+      onTap: (value) {
+        if (value == 0) ref.read(todoListFilter.notifier).state = TodoListFilter.all;
+        if (value == 1) ref.read(todoListFilter.notifier).state = TodoListFilter.active;
+        if (value == 2) ref.read(todoListFilter.notifier).state = TodoListFilter.completed;
+      },
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.list),
+          label: 'All',
+          tooltip: 'All'
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.circle),
+          label: 'Active',
+          tooltip: 'Active',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.done),
+          label: 'Completed',
+          tooltip: 'Completed',
+        ),
+      ],
+      currentIndex: currentIndex(),
+      selectedItemColor: Colors.amber[800],
+    );
+  }
+}
+
+
+/// A provider which exposes the [Todo] displayed by a [TodoItem].
+///
+/// By retrieving the [Todo] through a provider instead of through its
+/// constructor, this allows [TodoItem] to be instantiated using the `const` keyword.
+///
+/// This encapuslation ensures that when adding/removing/editing todos, 
+/// only what the impacted widgets rebuilds, instead of the entire list of items.
+final _currentTodo = Provider<Todo>((ref) => throw UnimplementedError());
+
+class TodoItem extends HookConsumerWidget {
+  const TodoItem({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final todo = ref.watch(_currentTodo);
+    final itemFocusNode = useFocusNode();
+    final itemIsFocused = useIsFocused(itemFocusNode);
+
+    final textEditingController = useTextEditingController();
+    final textFieldFocusNode = useFocusNode();
+
+    return Material(
+      color: Colors.white,
+      elevation: 6,
+      child: Focus(
+        focusNode: itemFocusNode,
+        onFocusChange: (focused) {
+          if (focused) {
+            textEditingController.text = todo.description;
+          } else {
+            // Commit changes only when the textfield is unfocused, for performance
+            ref.read(todoListProvider.notifier).edit(id: todo.id, description: textEditingController.text);
+          }
+        },
+        child: ListTile(
+          onTap: () {
+            itemFocusNode.requestFocus();
+            textFieldFocusNode.requestFocus();
+          },
+          leading: Checkbox(
+            value: todo.completed,
+            onChanged: (value) => ref.read(todoListProvider.notifier).toggle(todo.id),
+          ),
+          title: itemIsFocused
+              ? TextField(
+                  autofocus: true,
+                  focusNode: textFieldFocusNode,
+                  controller: textEditingController,
+                )
+              : Text(todo.description),
+        ),
+      ),
+    );
+  }
+}
+
+bool useIsFocused(FocusNode node) {
+  final isFocused = useState(node.hasFocus);
+
+  useEffect(
+    () {
+      void listener() {
+        isFocused.value = node.hasFocus;
+      }
+
+      node.addListener(listener);
+      return () => node.removeListener(listener);
+    },
+    [node],
+  );
+
+  return isFocused.value;
+}
+```
+
+Whoa, that's a lot!
+But that's all we need!
+Don't worry, we'll go through it 
+and explain what we just did!
+
+### 4.1. `TodoItem` 
+
+If we look at the `Todo` item,
+we see that it *extends*
+`HookConsumerWidget`.
+To access the state within the 
+providers we created beforehand,
+we need our widgets to extend
+`ConsumerWidget`.
+The difference between
+`ConsumerWidget` and `HookConsumerWidget`
+is that the latter
+just allows us to use hooks.
+Hooks, as mentioned prior,
+aren't `Riverpod`-related at all.
+They just allow us to write code 
+regarding the widget lifecycle and state.
+This concept is borrowed from `React`
+and you can learn more about them
+here: https://docs-v2.riverpod.dev/docs/about_hooks.
+
+As we stated, 
+to access the provider value,
+we extend with `ConsumerWidget`.
+By extending with this,
+the widget will have access
+to a `ref` in the `build()`
+function with wich we can
+access the providers.
+Hence why the
+`final todo = ref.watch(_currentTodo);` 
+line inside `TodoItem`.
+
+The `_currentTodo` is a
+small provider that refers
+to the local state of the `TodoItem`.
+We did this just for optimization purposes.
+We could have a `StatefulWidget` in which 
+we pass the `Todo` object 
+when creating this `TodoItem` widget.
+
+If you check the code,
+the `TodoItem` will allow users to
+edit the `Todo` item by tapping it.
+When it taps/focusing,
+the description becomes editable.
+
+They can edit by changing
+the text and then unfocusing 
+(e.g. tapping away from the `TodoItem` widget).
+
+```dart
+onFocusChange: (focused) {
+  if (focused) {
+    textEditingController.text = todo.description;
+  } else {
+    // Commit changes only when the textfield is unfocused, for performance
+    ref.read(todoListProvider.notifier).edit(id: todo.id, description: textEditingController.text);
+  }
+},
+```
+
+`ref.read(todoListProvider.notifier)`
+returns the `TodoList` 
+(remember that the `TodoList` 
+`StateNotifier` object?)
+in which we can call the `edit()` function
+to edit the `todo` item.
+
+The `TodoItem` also has a `Checkbox`,
+that shows if the `todo` item is 
+completed or not.
+
+```dart
+leading: Checkbox(
+  value: todo.completed,
+  onChanged: (value) => ref.read(todoListProvider.notifier).toggle(todo.id),
+),
+```
+
+Similarly to before,
+we call the `toggle()` function
+inside the `TodoList` to
+toggle the `todo` item between
+"completed" or not.
+
+And that's how we access
+and effectively change the 
+shared state we defined through
+providers prior!
+Heck yeah! 🎉
+
+### 4.2. The `Menu`
+
+Let's go over the menu.
+The menu is located 
+in the bottom of the screen.
+It has three buttons, 
+each one referring to the filter
+we want to apply to the 
+`TodoList`.
+By default, the `All` is chosen, 
+which shows the `TodoList` without filters.
+But we can also show the `Active` todos
+and `Completed` todos!
+
+So, it makes sense to make use 
+of the `todoListFilter` provider
+we defined earlier,
+which gives us information about the 
+current filter we need to be displaying.
+We access it by 
+`final filter = ref.watch(todoListFilter);`
+
+When a user wants to change filter,
+we want to change `todoListFilter`.
+For that, we simply change it like 
+so:
+
+```dart
+onTap: (value) {
+  if (value == 0) ref.read(todoListFilter.notifier).state = TodoListFilter.all;
+  if (value == 1) ref.read(todoListFilter.notifier).state = TodoListFilter.active;
+  if (value == 2) ref.read(todoListFilter.notifier).state = TodoListFilter.completed;
+},
+```
+
+### 4.3. `Home`
+
+Here's the last piece of the puzzle! 🧩
+In the `Home` widget,
+we are doing three things:
+- creating a `todo` item.
+- showing the number of `todo` items
+left that aren't completed.
+- displaying the filtered `todoList`.
+
+
+Let's go over each of these.
+
+#### 4.3.1. Creating a `todo` item
+
+On top of the page,
+you might notice there is 
+`Textfield` with a placeholder
+saying "What do we need to do?".
+This is where the user creates 
+a `todo` item.
+Luckily, to create a `todo` item
+is simple and it follows the same
+pattern as editing 
+and toggling a `todo` item.
+
+```dart
+TextField(
+  key: addTodoKey,
+  controller: newTodoController,
+  decoration: const InputDecoration(
+    labelText: 'What do we need to do?',
+  ),
+  onSubmitted: (value) {
+    ref.read(todoListProvider.notifier).add(value);
+    newTodoController.clear();
+  },
+)
+```
+
+By calling `ref.read(todoListProvider.notifier).add(value);`,
+we take the `value` of the textfield
+and create a new `todo` item
+by using the `add()` function
+of the `TodoList` class.
+A [`Textfield`](https://api.flutter.dev/flutter/material/TextField-class.html)
+necessitates a `controller`,
+which is created using the
+`useTextEditingController`.
+A controller, 
+as the name suggests,
+manages the state of the `Textfield`.
+In this case, we use it to 
+clear the text after adding the `todo` item to the list.
+This piece of information is outside of the scope
+but it shows how easy it is to use hooks
+and allows us to write less code
+to achieve the same thing 😃.
+
+#### 4.3.2. Displaying number of incomplete `todo` items
+
+It is as easy as pie
+to display the number of
+incomplete `todo` items!
+We just need to access
+the `uncompletedTodosCount` provider
+we defined earlier. 
+It only holds an integer value,
+so we can simply print it.
+
+```dart
+Text(
+'${ref.watch(uncompletedTodosCount)} items left',
+style: const TextStyle(fontSize: 20)
+),
+```
+
+#### 4.3.3. Displaying the filtered `todoList`
+The most important part
+is showing the `todo` items, isn't it?
+For that, 
+we make use of the `filteredTodos`
+provider we defined in the
+`lib/provider.dart` file.
+We just need to go over
+the filtered list and 
+show it to the user!
+`filteredTodos` already knows
+which items they need to show for us
+because they change whenever 
+`todoListFilter` changes 
+(we explained this beforehand).
+We access the `filteredTodos`
+like so: 
+`final todos = ref.watch(filteredTodos);`
+
+Afterwards, in the `build()` function,
+we go over the `todos` variable
+and create `TodoItem` widgets like so.
+
+```dart
+for (var i = 0; i < todos.length; i++) ...[
+
+  if (i > 0) const Divider(height: 0),
+  ProviderScope(
+      overrides: [
+        _currentTodo.overrideWithValue(todos[i]),
+      ],
+      child: const TodoItem(),
+  ),
+
+]
+```
+
+Remember when we used the
+`_currentTodo` provider in the `TodoItem`?
+We are the using `ProviderScope`
+function to **override** the value inside
+the `TodoItem`. 
+With this, the `TodoItem` now pertains
+correctly to a given `todo` item and shows
+the information correctly.
+
+And that should be it!
+You just *leveraged `Riverpod`* and 
+created shared data that is
+reusable across all the widgets
+within the application!
+
+But we don't stop here.
+We want to persist these todo items
+in an API and fetch accordingly.
+
+Let's roll. 🏃
+
+## 5. Embedding API
+//TODO
+
