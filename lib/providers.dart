@@ -41,7 +41,7 @@ final uncompletedTodosCount = Provider<int>((ref) {
 /// It only re-calculates if either the `filter` or `todos`list updates.
 final filteredTodos = Provider<List<Todo>>((ref) {
   final filter = ref.watch(todoListFilter);
-  final todos = ref.watch(todoListProvider).value;
+  final todos = ref.watch(todoListProvider).valueOrNull;
 
   if (todos != null) {
     switch (filter) {

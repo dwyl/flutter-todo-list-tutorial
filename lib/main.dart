@@ -58,7 +58,10 @@ class _HomeState extends ConsumerState<Home> {
             child: Scaffold(
               body: todosProvider.when(
                   loading: () => const Center(child: Center(child: CircularProgressIndicator())),
-                  error: (error, stack) => const Text('Oops, something unexpected happened'),
+                  error: (error, stack) => const Center(
+                          child: Center(
+                        child: Text('Could\'nt make API request. Make sure server is running.'),
+                      )),
                   data: (_) => ListView(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
                         children: [
