@@ -38,51 +38,60 @@ class _HomeState extends ConsumerState<Home> {
   @override
   void initState() {
     super.initState();
-    var todos = TodoRepository.fetchTodoList();
+  }
+
+  Future<void> onRefresh() {
+    return ref.read(todoListProvider.notifier).fetchTodos();
   }
 
   @override
   Widget build(BuildContext context) {
+    final AsyncValue<List<Todo>> todosProvider = ref.watch(todoListProvider); // this is only used for the loading animation
+
     final todos = ref.watch(filteredTodos);
     final newTodoController = useTextEditingController();
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        body: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          children: [
-            TextField(
-              key: addTodoKey,
-              controller: newTodoController,
-              decoration: const InputDecoration(
-                labelText: 'What do we need to do?',
-              ),
-              onSubmitted: (value) {
-                ref.read(todoListProvider.notifier).add(value);
-                newTodoController.clear();
-              },
-            ),
-            const SizedBox(height: 42),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: Text('${ref.watch(uncompletedTodosCount)} items left', style: const TextStyle(fontSize: 20)),
-            ),
-            if (todos.isNotEmpty) const Divider(height: 0),
-            for (var i = 0; i < todos.length; i++) ...[
-              if (i > 0) const Divider(height: 0),
-              ProviderScope(
-                overrides: [
-                  _currentTodo.overrideWithValue(todos[i]),
-                ],
-                child: const TodoItem(),
-              ),
-            ],
-          ],
-        ),
-        bottomNavigationBar: const Menu(),
-      ),
-    );
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: RefreshIndicator(
+            onRefresh: onRefresh,
+            child: Scaffold(
+              body: todosProvider.when(
+                  loading: () => const Center(child: Center(child: CircularProgressIndicator())),
+                  error: (error, stack) => const Text('Oops, something unexpected happened'),
+                  data: (_) => ListView(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+                        children: [
+                          TextField(
+                            key: addTodoKey,
+                            controller: newTodoController,
+                            decoration: const InputDecoration(
+                              labelText: 'What do we need to do?',
+                            ),
+                            onSubmitted: (value) {
+                              ref.read(todoListProvider.notifier).add(value);
+                              newTodoController.clear();
+                            },
+                          ),
+                          const SizedBox(height: 42),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Text('${ref.watch(uncompletedTodosCount)} items left', style: const TextStyle(fontSize: 20)),
+                          ),
+                          if (todos.isNotEmpty) const Divider(height: 0),
+                          for (var i = 0; i < todos.length; i++) ...[
+                            if (i > 0) const Divider(height: 0),
+                            ProviderScope(
+                              overrides: [
+                                _currentTodo.overrideWithValue(todos[i]),
+                              ],
+                              child: const TodoItem(),
+                            ),
+                          ],
+                        ],
+                      )),
+              bottomNavigationBar: const Menu(),
+            )));
   }
 }
 
@@ -162,7 +171,6 @@ class TodoItem extends HookConsumerWidget {
           if (focused) {
             textEditingController.text = todo.description;
           } else {
-            
             // Only call for todo text change if a value is actually different
             if (todo.description != textEditingController.text) {
               // Commit changes only when the textfield is unfocused, for performance

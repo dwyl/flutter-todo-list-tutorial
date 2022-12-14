@@ -34,10 +34,10 @@ class Todo {
 /// on any modification method.
 class TodoList extends StateNotifier<AsyncValue<List<Todo>>> {
   TodoList() : super(const AsyncValue.loading()) {
-    _fetch();
+    fetchTodos();
   }
 
-  Future<void> _fetch() async {
+  Future<void> fetchTodos() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       return await TodoRepository.fetchTodoList();
