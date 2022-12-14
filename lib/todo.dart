@@ -17,6 +17,10 @@ class Todo {
   final String id;
   final String description;
   final bool completed;
+
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    return Todo(id: json['id'].toString(), description: json['text'], completed: json['status'] == 0 ? false : true);
+  }
 }
 
 /// An object that controls a list of [Todo].
