@@ -8,14 +8,15 @@ for app state management.
 # What? 💡
 
 This is a simple **Todo list application**
-that allows you to track todo items that you
-create and edit. 
+that allows you to track todo items 
+that you create and edit. 
 You can check your current active todo items,
-check the completed ones and
-also have an overview of every task you've created.
+check the completed ones 
+and also have an overview of every task you've created.
 Oh! And it's also fully tested! 😃
 
-This app connects to an API 
+We also show you a bonus feature,
+where this app connects to an API 
 implemented with [`Phoenix`](https://github.com/dwyl/learn-phoenix-framework)
 to persist the todo list items.
 
@@ -23,14 +24,15 @@ to persist the todo list items.
 
 As we are focused on building our [`mvp`](https://github.com/dwyl/mvp),
 we are looking to have the frontend counterpart
-that is **cross-platform** and fastly *iterable*.
-Setting this walkthrough will help *you*
-understand better the fundamentals of having
-an app with a robust state management library 
+that is **cross-platform** and easily *iterable*.
+Setting this walk-through will help *you*
+understand better the fundamentals 
+of having an app with a robust state management library 
 that can be used in **real-world applications**.
 
 It also helps *us* to have a detailed guide
-of a fully tested app that is documented 
+of a fully tested app 
+that is documented 
 and is something we can go back to. 😊
 
 # How? 💻
@@ -47,32 +49,31 @@ https://github.com/dwyl/learn-dart
 
 https://github.com/dwyl/learn-flutter
 
-If you want a walkthrough on 
+If you want a walk-through on 
 *two* simpler applications,
-we highly recommend going through
-these in order so you can understand
-the ins and outs better.
+we highly recommend going through the following in order,
+so you can understand the ins and outs better.
 
 1. https://github.com/dwyl/flutter-counter-example
 2. https://github.com/dwyl/flutter-stopwatch-tutorial/pulls
 
-This tutorial will sacrifice some
-setup steps that are found in the aforementioned,
-so make sure to check these out if
-you feel like you are lost or 
-this is your first time using Flutter.
+This tutorial will sacrifice
+some setup steps that are found in the aforementioned,
+so make sure to check these out 
+if you feel like you are lost 
+or this is your first time using Flutter.
 We will focus more on **shared state**
-and **data management** instead of 
-styling. So `Riverpod` and fetching
-data from API will get the spotlight here.
-🔦
+and **data management** 
+instead of styling. 
+So `Riverpod` and fetching data from API 
+will get the spotlight here. 🔦
 
 
 Right! 
 Before building this app,
 let's check out the final result!
 After cloning this repository 
-and traveling to the directory you cloned the repo in,
+and travelling to the directory you cloned the repo in,
 run the following command to install the dependencies.
 
 ```sh
@@ -115,35 +116,32 @@ This app uses [`Riverpod`](https://riverpod.dev/)
 for state management inside the widget tree.
 This library will allow us to declare 
 and use shared state from anywhere 
-and have a greater control on 
-UI rebuilds.
+and have a greater control on UI rebuilds.
 
 
-Here is how our widget tree
-will look like. 
+Here is how our widget tree will look like. 
 
 ![widgets-tree](https://user-images.githubusercontent.com/6057298/93343977-03d72380-f829-11ea-8c4b-dc964c591e97.png)
 
 ## 1. Project setup
 
-> In this walkthrough we are going to use Visual Studio Code. 
+> In this walk-through we are going to use Visual Studio Code. 
 > We will assume you have this IDE installed, 
 > as well as the Flutter and Dart extensions installed. 
 
 After restarting Visual Studio Code, 
 let's create a new project! 
 Click on `View > Command Palette`, 
-type `Flutter` and click on `Flutter: New Project`.
+type `Flutter` 
+and click on `Flutter: New Project`.
 It will ask you for a name of the new project.
 We are going to name it **"todo_app**".
 
 After generating the project, 
-let's now add all the needed
-dependencies.
+let's now add all the needed dependencies.
 As it was stated before,
-we are going to be using
-`Riverpod` for state management and
-accessing shared data across the widget tree.
+we are going to be using `Riverpod` for state management
+and accessing shared data across the widget tree.
 Along side this library, 
 are going to also use 
 [`uuid`](https://pub.dev/packages/uuid)
@@ -217,13 +215,11 @@ class Todo {
 We just created our `Todo` model class.
 Each `todo` item has an `id`, a `description`
 and a boolean `completed` field
-that toggles between the `todo` item being
-done or not.
+that toggles between the `todo` item being done or not.
 Pretty simple, right? 😉
 
 You might have noticed there is an
-`@immutable` annotation being used 
-for this class.
+`@immutable` annotation being used for this class.
 This is directly related to **code-generation**.
 You might have noticed the `build_runner` 
 dependency we added earlier. 
@@ -231,8 +227,7 @@ This is the tool that will generate code for us.
 In short, code generation allows us to
 work with `Riverpod` with a friendlier syntax
 and reduce boilerplate code.
-If you want to learn more about 
-code generation in `Riverpod` 
+If you want to learn more about code generation in `Riverpod` 
 and how it is useful, 
 check the follow link ->
 https://docs-v2.riverpod.dev/docs/about_code_generation
@@ -242,35 +237,31 @@ We are going to be storing our `todo` items
 in a **list** - `TodoList`.
 We want this list to be *accessible*
 anywhere within the widget tree.
-But before that, 
-let's clear some concepts.
+But before that, let's clear some concepts.
 
 ### 2.1. `Riverpod` Provider
 
 When using `Riverpod`,
 you are going to see the word **"Provider"** 
-tossed around a lot. And for good reason,
-because it's important!
+tossed around a lot. 
+And for good reason, because it's important!
 **A provider is an object that encapsulates
  a piece of state and allows listening to that state.**.
 
  By wrapping a piece of state in a `provider`,
  you will make it so that:
- - it is acessible from multiple locations within
- the widget tree.
- - enable performance optimizations, 
- like caching the value.
+ - it is accessible from multiple locations within the widget tree.
+ - enable performance optimizations, like caching the value.
  - increase testability of your application.
  - among others...
 
- We have acess to 
+ We have access to 
  [different types of providers](https://docs-v2.riverpod.dev/docs/concepts/providers#different-types-of-providers)
  that are suitable for different use cases.
  In our application,
  we are going to be using `Provider`,
  `StateProvider` and `StateNotifierProvider`.
- We are going to get to these when we implement them.
- 😉
+ We are going to get to these when we implement them. 😉
  > If you want to learn more
  > about Providers, 
  > check the official docs -> 
@@ -278,8 +269,7 @@ because it's important!
 
 ## 2.2.Adding `TodoList` using the `StateNotifierProvider`
 
-Now that we know a bit about
-what a `Provider` is,
+Now that we know a bit about what a `Provider` is,
 let's start using one. 
 Don't worry if you are still confused,
 you will see how it works!
@@ -358,19 +348,17 @@ The first thing we notice is that
 Let's dissect this.
 We are using `StateNotifierProvider`
 because it fits our use case.
-Our list of `todos` are going to 
-change according to what the user does:
+Our list of `todos` are going to change 
+according to what the user does:
 we will add a `todo` item if he creates one
-and update a `todo` item if he decides
-to edit one.
+and update a `todo` item if he decides to edit one.
 If he marks a `todo` item as completed,
 we need to update that in our `todolist`.
 
 In the code above, we are using `StateNotifier`,
-which is what `StateNotifierProvider` will expose
-to the widgets. 
-Think of `StateNotifier` as *an object* that is
-going to change over time.
+which is what `StateNotifierProvider` will expose to the widgets. 
+Think of `StateNotifier` as *an object* 
+that is going to change over time.
 
 Inside the `TodoList` class,
 we define **three methods**:
@@ -378,8 +366,7 @@ one that `add`s a todo to the list;
 one that `toggle`s a todo item inside the list;
 and one that `edits` a todo item inside the list
 (e.g. update the description).
-**Notice that we are not changing the object
-in these functions**. 
+**Notice that we are not changing the object in these functions**. 
 We are creating **copies** of the state,
 changing the copy and assigning it to the state.
 
@@ -392,13 +379,10 @@ to create an `id` to the newly created item.
 
 In the `toggle` function, 
 we find the `todo` item we want
-to mark as completed/uncompleted
-and update it.
+to mark as completed/uncompleted and update it.
 
-In the `edit` function 
-we do something similar,
-except we change the description
-of the todo item.
+In the `edit` function we do something similar,
+except we change the description of the todo item.
 
 Again, in all of these methods
 we don't *change* the list. 
@@ -407,8 +391,7 @@ We create a new updated one
 
 ## 3. Adding providers
 
-Now that we added
-the blocks to create our `provider`s,
+Now that we added the blocks to create our `provider`s,
 let's do that!
 
 In a new file `lib/providers.dart`,
@@ -425,31 +408,24 @@ final todoListProvider = StateNotifierProvider<TodoList, List<Todo>>((ref) {
 });
 ```
 
-We have stated before that 
-we were going to be using `StateNotifierProvider`
-to hold the `TodoList` so it could be shared
-everywhere in the application.
-But `StateNotifierProvider` exposes
-`StateNotifier` object, 
+We have stated before 
+that we were going to be using `StateNotifierProvider`
+to hold the `TodoList` 
+so it could be shared everywhere in the application.
+But `StateNotifierProvider` exposes `StateNotifier` object, 
 which we already created (it is our `TodoList`).
-Now here we are just creating it
-and exposing it ☺️. 
+Now here we are just creating it and exposing it ☺️. 
 In this case, 
-we are creating a `TodoList`
-with a single `todo` item by default.
+we are creating a `TodoList` with a single `todo` item by default.
 
 ### 3.1 - Filtering the `TodoList`
 
-We want to be able to check
-**all** the `todo` items,
+We want to be able to check **all** the `todo` items,
 the **active** ones (created but not completed)
 and the **completed** ones.
 
-For that, the application 
-is going to need to be able
-to *filter* the `TodoList` 
-and know what the *current filter*
-is currently being on
+For that, the application is going to need to be able to *filter* the `TodoList` 
+and know what the *current filter* is currently being on
 (if the screen is showing `all`,
 or `completed` or `active` items).
 Let's do this.
@@ -483,47 +459,36 @@ final filteredTodos = Provider<List<Todo>>((ref) {
 });
 ```
 
-We are firstly defining an `enum` with
-all the possible filters. 
+We are firstly defining an `enum` with all the possible filters. 
 We added three: `all`, `active` and `completed`.
 
-The `todoListFilter` refers to the
-*currently active filter* that
-is shown on screen.
+The `todoListFilter` refers 
+to the *currently active filter* that is shown on screen.
 For this we are using the 
 [`State Provider`](https://docs-v2.riverpod.dev/docs/providers/state_provider)
 provider type.
-This provider type is actually a much
-*simpler* `StateNotifierProvider`. 
-We don't need to create a `StateNotifier` object
-like we did before, 
+This provider type is actually a much *simpler* `StateNotifierProvider`. 
+We don't need to create a `StateNotifier` object like we did before, 
 so it's meant for very simple use-cases.
 Just like this one!
-We just want to know the value of the
-current filter, and that is it!
+We just want to know the value of the current filter, 
+and that is it!
 
 
-The `filteredTodos` will
-return the `TodoList` filtered according
-to a specific filter.
+The `filteredTodos` will return the `TodoList` filtered according to a specific filter.
 If the `all` filter is applied, 
 we just show all the `todo` items.
 If the `completed` filter is applied,
-we return the `TodoList` with only
-the *completed* todo items.
+we return the `TodoList` with only the *completed* todo items.
 It uses the 
 [`Provider`](https://docs-v2.riverpod.dev/docs/providers/provider)
-type provider - which is the most basic
-of all of them.
-It just creates a value -
-in this case, an array of `todo` items.
-It's useful this value (the `todo` items 
-that is returned by this provider) 
+type provider - which is the most basic of all of them.
+It just creates a value - in this case, an array of `todo` items.
+It's useful because this value 
+(the `todo` items  that is returned by this provider) 
 only rebuilds whenever we want it to update.
-So, in this case, it only updates when
-`todoListFilter` (the current filter)
-and `todoListProvider` (the list of `todo` items)
-change.
+So, in this case, it only updates when `todoListFilter` (the current filter)
+and `todoListProvider` (the list of `todo` items) change.
 Hence why these lines exist.
 
 ```dart
@@ -546,24 +511,19 @@ final uncompletedTodosCount = Provider<int>((ref) {
 ```
 
 Similarly to what we did before,
-we are using the `Provider`
-type of provider.
-`uncompletedTodosCount` is
-only recomputated when
-`todoListProvider` changes.
+we are using the `Provider` type of provider.
+`uncompletedTodosCount` is only recomputated 
+when `todoListProvider` changes.
 
 ## 4. Creating the app
 
-Now that all the providers
-we need are set up,
+Now that all the providers we need are set up,
 we just now need to create our app,
 style it to our liking 
-and access this shared state we just created
-accordingly!
+and access this shared state we just created accordingly!
 
-We will now add all the code
-needed for this to work and 
-we'll walk you through it 
+We will now add all the code needed for this to work 
+and  we'll walk you through it 
 and explain it in sections.
 
 For now, let's add our code.
@@ -782,22 +742,17 @@ bool useIsFocused(FocusNode node) {
 
 Whoa, that's a lot!
 But that's all we need!
-Don't worry, we'll go through it 
-and explain what we just did!
+Don't worry, we'll go through it and explain what we just did!
 
 ### 4.1. `TodoItem` 
 
 If we look at the `Todo` item,
-we see that it *extends*
-`HookConsumerWidget`.
-To access the state within the 
-providers we created beforehand,
-we need our widgets to extend
-`ConsumerWidget`.
+we see that it *extends* `HookConsumerWidget`.
+To access the state within the providers we created beforehand,
+we need our widgets to extend `ConsumerWidget`.
 The difference between
 `ConsumerWidget` and `HookConsumerWidget`
-is that the latter
-just allows us to use hooks.
+is that the latter just allows us to use hooks.
 Hooks, as mentioned prior,
 aren't `Riverpod`-related at all.
 They just allow us to write code 
@@ -810,30 +765,27 @@ As we stated,
 to access the provider value,
 we extend with `ConsumerWidget`.
 By extending with this,
-the widget will have access
-to a `ref` in the `build()`
-function with wich we can
-access the providers.
+the widget will have access to a `ref` in the `build()`
+function which is what we can use to access the providers.
 Hence why the
 `final todo = ref.watch(_currentTodo);` 
 line inside `TodoItem`.
 
-The `_currentTodo` is a
-small provider that refers
-to the local state of the `TodoItem`.
+The `_currentTodo` is a small provider 
+that refers to the local state of the `TodoItem`.
 We did this just for optimization purposes.
-We could have a `StatefulWidget` in which 
-we pass the `Todo` object 
+We could have a `StatefulWidget` 
+in which we pass the `Todo` object 
 when creating this `TodoItem` widget.
 
 If you check the code,
-the `TodoItem` will allow users to
-edit the `Todo` item by tapping it.
+the `TodoItem` will allow users 
+to edit the `Todo` item by tapping it.
 When it taps/focusing,
 the description becomes editable.
 
 They can edit by changing
-the text and then unfocusing 
+the text and then unfocussing 
 (e.g. tapping away from the `TodoItem` widget).
 
 ```dart
@@ -866,15 +818,12 @@ leading: Checkbox(
 ```
 
 Similarly to before,
-we call the `toggle()` function
-inside the `TodoList` to
-toggle the `todo` item between
-"completed" or not.
+we call the `toggle()` function inside the `TodoList` 
+to toggle the `todo` item between "completed" or not.
 
 And that's how we access
-and effectively change the 
-shared state we defined through
-providers prior!
+and effectively change the shared state 
+we defined through providers prior!
 Heck yeah! 🎉
 
 ### 4.2. The `Menu`
@@ -961,11 +910,11 @@ A [`Textfield`](https://api.flutter.dev/flutter/material/TextField-class.html)
 necessitates a `controller`,
 which is created using the
 `useTextEditingController`.
-A controller, 
-as the name suggests,
+A controller, as the name suggests,
 manages the state of the `Textfield`.
-In this case, we use it to 
-clear the text after adding the `todo` item to the list.
+In this case, 
+we use it to clear the text 
+after adding the `todo` item to the list.
 This piece of information is outside of the scope
 but it shows how easy it is to use hooks
 and allows us to write less code
