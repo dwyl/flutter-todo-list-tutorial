@@ -5,10 +5,8 @@ import 'package:todo_app/todo.dart';
 ///
 /// We are using [StateNotifierProvider] here as a `List<Todo>` is a complex
 /// object, with advanced business logic like how to edit a todo.
-final todoListProvider = StateNotifierProvider<TodoList, List<Todo>>((ref) {
-  return TodoList(const [
-    Todo(id: '0', description: 'hey there :)'),
-  ]);
+final todoListProvider = StateNotifierProvider<TodoList, AsyncValue<List<Todo>>>((ref) {
+  return TodoList();
 });
 
 /// Enum with possible filters of the `todo` list.
@@ -33,23 +31,28 @@ final todoListFilter = StateProvider((_) => TodoListFilter.all);
 /// This will also optimise unneeded rebuilds if the todo-list changes, but the
 /// number of uncompleted todos doesn't (such as when editing a todo).
 final uncompletedTodosCount = Provider<int>((ref) {
-  return ref.watch(todoListProvider).where((todo) => !todo.completed).length;
+  final count = ref.watch(todoListProvider).value?.where((todo) => !todo.completed).length;
+  return count ?? 0;
 });
 
 /// The list of todos after applying a [todoListFilter].
 ///
 /// This too uses [Provider], to avoid recomputing.
-/// It only re-calculates if either the `filter` or `todos`list updates. 
+/// It only re-calculates if either the `filter` or `todos`list updates.
 final filteredTodos = Provider<List<Todo>>((ref) {
   final filter = ref.watch(todoListFilter);
-  final todos = ref.watch(todoListProvider);
+  final todos = ref.watch(todoListProvider).value;
 
-  switch (filter) {
-    case TodoListFilter.completed:
-      return todos.where((todo) => todo.completed).toList();
-    case TodoListFilter.active:
-      return todos.where((todo) => !todo.completed).toList();
-    case TodoListFilter.all:
-      return todos;
+  if (todos != null) {
+    switch (filter) {
+      case TodoListFilter.completed:
+        return todos.where((todo) => todo.completed).toList();
+      case TodoListFilter.active:
+        return todos.where((todo) => !todo.completed).toList();
+      case TodoListFilter.all:
+        return todos;
+    }
+  } else {
+    return [];
   }
 });

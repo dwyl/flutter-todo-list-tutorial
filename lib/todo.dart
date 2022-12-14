@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:riverpod/riverpod.dart';
+import 'package:todo_app/repository/todoRepository.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
@@ -21,6 +22,8 @@ class Todo {
   factory Todo.fromJson(Map<String, dynamic> json) {
     return Todo(id: json['id'].toString(), description: json['text'], completed: json['status'] == 0 ? false : true);
   }
+
+  Map<String, dynamic> toJson() => {'person_id': 0, 'status': completed ? 1 : 0, 'text': description};
 }
 
 /// An object that controls a list of [Todo].
@@ -29,50 +32,63 @@ class Todo {
 ///
 /// State is immutable, hence why a copy of state is created
 /// on any modification method.
-class TodoList extends StateNotifier<List<Todo>> {
-  TodoList([List<Todo>? initialTodos]) : super(initialTodos ?? []);
+class TodoList extends StateNotifier<AsyncValue<List<Todo>>> {
+  TodoList() : super(const AsyncValue.loading()) {
+    _fetch();
+  }
+
+  Future<void> _fetch() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return await TodoRepository.fetchTodoList();
+    });
+  }
 
   /// Adds `todo` item to list.
-  void add(String description) {
-    // Since our state is immutable, we are not allowed to do `state.add(todo)`.
-    state = [
-      ...state,
-      Todo(
-        id: _uuid.v4(),
-        description: description,
-      ),
-    ];
+  Future<void> add(String description) async {
+    state = await AsyncValue.guard(() async {
+      Todo returned_todo = await TodoRepository.createTodo(description);
+      return [...?state.value, returned_todo];
+    });
   }
 
   /// Toggles `todo` item between completed or not completed.
-  void toggle(String id) {
-    final newState = [...state];
-    final todoToReplaceIndex = state.indexWhere((todo) => todo.id == id);
+  Future<void> toggle(Todo todo) async {
+    state = await AsyncValue.guard(() async {
+      Todo returned_todo = await TodoRepository.updateTodoStatus(todo.id, !todo.completed);
 
-    if (todoToReplaceIndex != -1) {
-      newState[todoToReplaceIndex] = Todo(
-        id: newState[todoToReplaceIndex].id,
-        completed: !newState[todoToReplaceIndex].completed,
-        description: newState[todoToReplaceIndex].description,
-      );
-    }
+      final newState = [...?state.value];
+      final todoToReplaceIndex = newState.indexWhere((todo) => todo.id == returned_todo.id);
 
-    state = newState;
+      if (todoToReplaceIndex != -1) {
+        newState[todoToReplaceIndex] = Todo(
+          id: returned_todo.id,
+          completed: returned_todo.completed,
+          description: returned_todo.description,
+        );
+      }
+
+      return newState;
+    });
   }
 
   /// Edits a `todo` item.
-  void edit({required String id, required String description}) {
-    final newState = [...state];
-    final todoToReplaceIndex = state.indexWhere((todo) => todo.id == id);
+  Future<void> edit({required String id, required String description}) async {
+    state = await AsyncValue.guard(() async {
+      Todo returned_todo = await TodoRepository.updateTodoText(id, description);
 
-    if (todoToReplaceIndex != -1) {
-      newState[todoToReplaceIndex] = Todo(
-        id: newState[todoToReplaceIndex].id,
-        completed: !newState[todoToReplaceIndex].completed,
-        description: description,
-      );
-    }
+      final newState = [...?state.value];
+      final todoToReplaceIndex = newState.indexWhere((todo) => todo.id == id);
 
-    state = newState;
+      if (todoToReplaceIndex != -1) {
+        newState[todoToReplaceIndex] = Todo(
+          id: returned_todo.id,
+          completed: returned_todo.completed,
+          description: returned_todo.description,
+        );
+      }
+
+      return newState;
+    });
   }
 }
