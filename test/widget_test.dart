@@ -5,19 +5,68 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/src/client.dart';
 
 import 'package:todo_app/main.dart';
+import 'package:todo_app/providers.dart';
+import 'package:todo_app/repository/todoRepository.dart';
+import 'package:todo_app/todo.dart';
+import 'package:uuid/uuid.dart';
+
+/// Mock repository 
+class FakeRepository implements TodoRepository {
+  @override
+  Client get client => Client();
+
+  @override
+  Future<List<Todo>> fetchTodoList() async {
+    return [
+      const Todo(id: '0', description: 'hey there :)'),
+    ];
+  }
+
+  @override
+  Future<Todo> createTodo(String description) async {
+    return Todo(id: const Uuid().v4(), description: description);
+  }
+
+  @override
+  Future<Todo> updateTodoStatus(String id, bool completed) async {
+    return Todo(id: id, description: "hey there :)", completed: completed);
+  }
+
+  @override
+  Future<Todo> updateTodoText(String id, String text) async {
+    return Todo(id: const Uuid().v4(), description: text);
+  }
+}
+
 
 void main() {
   final addTodoInput = find.byKey(addTodoKey);
   final homeComponent = find.byType(Home);
 
   testWidgets('Build correctly setup', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const ProviderScope(child: App()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        repositoryProvider.overrideWith((ref) => FakeRepository())
+      ], 
+      child: const App())
+    );
+
+    // The first frame is a loading state.
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    // Re-render. TodoListProvider should have finished fetching the todos by now
+    await tester.pump();
+
+    // No longer loading
+    expect(find.byType(CircularProgressIndicator), findsNothing);
 
     // Find the text input, bottom navigation
     expect(find.byKey(addTodoKey), findsOneWidget);
@@ -28,8 +77,15 @@ void main() {
   });
 
   testWidgets('Adds todo and renders newly created todo', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const ProviderScope(child: App()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        repositoryProvider.overrideWith((ref) => FakeRepository())
+      ], 
+      child: const App())
+    );
+
+    // Re-render to skip the loading animation
+    await tester.pump();
 
     // Type text into todo input
     await tester.enterText(addTodoInput, 'new todo');
@@ -59,8 +115,16 @@ void main() {
   });
 
   testWidgets('Editing a todo item', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: App()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        repositoryProvider.overrideWith((ref) => FakeRepository())
+      ], 
+      child: const App())
+    );
 
+    // Re-render to skip the loading animation
+    await tester.pump();
+    
     // Expect to find the default todo item
     expect(find.text('hey there :)'), findsOneWidget);
     final firstItem = find.byType(TodoItem);
@@ -86,7 +150,15 @@ void main() {
   });
 
   testWidgets('Marking todo item as done and checking it in the completed tab', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: App()));
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        repositoryProvider.overrideWith((ref) => FakeRepository())
+      ], 
+      child: const App())
+    );
+
+    // Re-render to skip the loading animation
+    await tester.pump();
 
     // Getting first todo item
     final firstItem = find.byType(TodoItem);

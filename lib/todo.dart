@@ -33,7 +33,9 @@ class Todo {
 /// State is immutable, hence why a copy of state is created
 /// on any modification method.
 class TodoList extends StateNotifier<AsyncValue<List<Todo>>> {
-  TodoList() : super(const AsyncValue.loading()) {
+  final TodoRepository;
+
+  TodoList(this.TodoRepository) : super(const AsyncValue.loading()) {
     fetchTodos();
   }
 

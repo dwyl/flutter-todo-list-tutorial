@@ -1,12 +1,18 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:todo_app/repository/todoRepository.dart';
 import 'package:todo_app/todo.dart';
+
+// We expose our instance of TodoRepository in a provider
+final repositoryProvider = Provider((ref) => TodoRepository());
 
 /// Creates a [TodoList].
 ///
 /// We are using [StateNotifierProvider] here as a `List<Todo>` is a complex
 /// object, with advanced business logic like how to edit a todo.
 final todoListProvider = StateNotifierProvider<TodoList, AsyncValue<List<Todo>>>((ref) {
-  return TodoList();
+  final repository = ref.read(repositoryProvider);
+
+  return TodoList(repository);
 });
 
 /// Enum with possible filters of the `todo` list.

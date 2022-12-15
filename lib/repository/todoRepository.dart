@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:todo_app/todo.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' show Client;
 
 // Localhost ios emulator - 127.0.0.1
 // Localhost android emulator - 10.0.2.2
@@ -10,8 +10,10 @@ import 'package:http/http.dart' as http;
 const baseUrl = 'http://192.168.1.201:4000/api';
 
 class TodoRepository {
-  static Future<List<Todo>> fetchTodoList() async {
-    final response = await http.get(Uri.parse('$baseUrl/items/'));
+  final Client client = Client();
+
+  Future<List<Todo>> fetchTodoList() async {
+    final response = await client.get(Uri.parse('$baseUrl/items/'));
 
     if (response.statusCode == 200) {
       Iterable l = json.decode(response.body);
@@ -21,8 +23,8 @@ class TodoRepository {
     }
   }
 
-  static Future<Todo> createTodo(String description) async {
-    final response = await http.post(Uri.parse('$baseUrl/items/'), body: {"text": description, "status": "0", "person_id": "0"});
+  Future<Todo> createTodo(String description) async {
+    final response = await client.post(Uri.parse('$baseUrl/items/'), body: {"text": description, "status": "0", "person_id": "0"});
 
     if (response.statusCode == 200) {
       return Todo.fromJson(jsonDecode(response.body));
@@ -31,8 +33,8 @@ class TodoRepository {
     }
   }
 
-  static Future<Todo> updateTodoText(String id, String text) async {
-    final response = await http.put(Uri.parse('$baseUrl/items/$id'), body: {"text": text});
+  Future<Todo> updateTodoText(String id, String text) async {
+    final response = await client.put(Uri.parse('$baseUrl/items/$id'), body: {"text": text});
 
     if (response.statusCode == 200) {
       return Todo.fromJson(jsonDecode(response.body));
@@ -41,8 +43,8 @@ class TodoRepository {
     }
   }
 
-  static Future<Todo> updateTodoStatus(String id, bool completed) async {
-    final response = await http.put(Uri.parse('$baseUrl/items/$id/status'), body: {"status": completed == true ? "1" : "0"} );
+  Future<Todo> updateTodoStatus(String id, bool completed) async {
+    final response = await client.put(Uri.parse('$baseUrl/items/$id/status'), body: {"status": completed == true ? "1" : "0"});
 
     if (response.statusCode == 200) {
       return Todo.fromJson(jsonDecode(response.body));

@@ -1086,14 +1086,15 @@ and add the following code.
 import 'dart:convert';
 
 import 'package:todo_app/todo.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart' show Client;
 
-
-const baseUrl = 'http://YOUR_API_ADDRESS:4000/api';
+const baseUrl = 'http://192.168.1.201:4000/api';
 
 class TodoRepository {
-  static Future<List<Todo>> fetchTodoList() async {
-    final response = await http.get(Uri.parse('$baseUrl/items/'));
+  final Client client = Client();
+
+  Future<List<Todo>> fetchTodoList() async {
+    final response = await client.get(Uri.parse('$baseUrl/items/'));
 
     if (response.statusCode == 200) {
       Iterable l = json.decode(response.body);
@@ -1103,8 +1104,8 @@ class TodoRepository {
     }
   }
 
-  static Future<Todo> createTodo(String description) async {
-    final response = await http.post(Uri.parse('$baseUrl/items/'), body: {"text": description, "status": "0", "person_id": "0"});
+  Future<Todo> createTodo(String description) async {
+    final response = await client.post(Uri.parse('$baseUrl/items/'), body: {"text": description, "status": "0", "person_id": "0"});
 
     if (response.statusCode == 200) {
       return Todo.fromJson(jsonDecode(response.body));
@@ -1113,8 +1114,8 @@ class TodoRepository {
     }
   }
 
-  static Future<Todo> updateTodoText(String id, String text) async {
-    final response = await http.put(Uri.parse('$baseUrl/items/$id'), body: {"text": text});
+  Future<Todo> updateTodoText(String id, String text) async {
+    final response = await client.put(Uri.parse('$baseUrl/items/$id'), body: {"text": text});
 
     if (response.statusCode == 200) {
       return Todo.fromJson(jsonDecode(response.body));
@@ -1123,8 +1124,8 @@ class TodoRepository {
     }
   }
 
-  static Future<Todo> updateTodoStatus(String id, bool completed) async {
-    final response = await http.put(Uri.parse('$baseUrl/items/$id/status'), body: {"status": completed == true ? "1" : "0"} );
+  Future<Todo> updateTodoStatus(String id, bool completed) async {
+    final response = await client.put(Uri.parse('$baseUrl/items/$id/status'), body: {"status": completed == true ? "1" : "0"});
 
     if (response.statusCode == 200) {
       return Todo.fromJson(jsonDecode(response.body));
@@ -1155,6 +1156,12 @@ Change the `baseUrl` variable
 according to the scenario 
 you're in and you should be able 
 to make requests.
+
+The reason we are using `client` 
+as a field inside `TodoRepository` 
+is so we are able to mock it 
+when testing.
+
 If you are stuck,
 try to follow this video - https://www.youtube.com/watch?v=cDYCWdkbJI4&ab_channel=PodCoder.
 If you are *still stuck*,
@@ -1235,10 +1242,11 @@ We are going to do this on the constructor, like so.
 
 ```dart
 class TodoList extends StateNotifier<AsyncValue<List<Todo>>> {
-  TodoList() : super(const AsyncValue.loading()) {
+  final TodoRepository;
+
+  TodoList(this.TodoRepository) : super(const AsyncValue.loading()) {
     fetchTodos();
   }
-}
 ```
 
 `TodoList` is now a `StateNotifier` 
@@ -1252,6 +1260,11 @@ that will convert an `AsyncValue` to a different object
 inside the widget (e.g. show the data, 
 or render a loading animation while loading
 or showing an error screen when an error occurs).
+
+The `TodoList` now also receives
+a `TodoRepository` object in its constructor.
+This is so we are able to mock HTTP requests
+when testing through dependency injection.
 
 In the previous snippet 
 we are assigning a loading state before `fetchTodos`.
@@ -1380,6 +1393,7 @@ or the state is loading.
 
 Your file should now look like the following.
 
+//CHANGEHERE
 [`lib/todo.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/e32b6df3f60170554f32fec039e33520db67fc85/lib/todo.dart)
 
 ### 5.2.2 Providers
@@ -1397,8 +1411,12 @@ and locate the `final todoListProvider` variable.
 Let's change it to the following.
 
 ```dart
+final repositoryProvider = Provider((ref) => TodoRepository());
+
 final todoListProvider = StateNotifierProvider<TodoList, AsyncValue<List<Todo>>>((ref) {
-  return TodoList();
+  final repository = ref.read(repositoryProvider);
+
+  return TodoList(repository);
 });
 ```
 
@@ -1407,6 +1425,13 @@ we are now returning `AsyncValue<List<Todo>>`.
 We now return a normal `TodoList` class instance.
 (remember that in the constructor of `TodoList`
 we call `fetchTodos()`).
+
+We also created a `repositoryProvider`,
+which will expose an instance of `TodoRepository`
+so it can be used in `todoListProvider`.
+This is because we want to **mock `repositoryProvider`**
+when writing unit and integration tests.
+This way we can mock the HTTP requests easily.
 
 Let's change the `final uncompletedTodosCount` provider.
 Locate it and change the code.
@@ -1457,7 +1482,7 @@ so it returns `null` if there is no data
 (it's still loading or it errored).
 
 Your file should now look like the following.
-
+//CHANGEHERE
 [`lib/providers.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/e32b6df3f60170554f32fec039e33520db67fc85/lib/providers.dart)
 
 And we are done here!
