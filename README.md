@@ -996,6 +996,702 @@ in an API and fetch accordingly.
 
 Let's roll. 🏃
 
-## 5. Embedding API
-//TODO
+## (Bonus) 5. Calling REST API
+
+As it stands, 
+you already grasped great knowledge using Riverpod.
+We've learn how to use providers
+and set-up shared data 
+so it can be used along the widget tree.
+
+However, most apps call external REST APIs
+and manage data according to these.
+So it's *crucial* to know how to manage shared data
+when the latter comes from a server.
+
+And this is what we are going to be doing
+in this chapter. 😉
+
+We are going to be using the API provided by
+our [`phoenix-todo-list tutorial`](https://github.com/dwyl/phoenix-todo-list-tutorial).
+If you follow the instructions,
+install the dependencies.
+
+```sh
+mix deps.get
+```
+
+and run the server
+
+```sh
+mix phx.server
+```
+
+you should be sorted for this part of the guide.
+However, you can use your own API!
+Just make sure it returns a list of todo items
+and you're good to go!
+
+Let's get cracking!
+
+### 5.1 Making calls to our API
+
+If you're running the Phoenix server,
+it should be serviceable at `localhost:4000`.
+
+Before adding a service to fetch from an API,
+we need to add a function to our `Todo` class
+so we can create one instance of it
+from the returned JSON from the API.
+For this,
+head on to `lib/todo.dart`
+and add the following functions
+to the class.
+
+```dart
+  factory Todo.fromJson(Map<String, dynamic> json) {
+    return Todo(id: json['id'].toString(), description: json['text'], completed: json['status'] == 0 ? false : true);
+  }
+
+  Map<String, dynamic> toJson() => {'person_id': 0, 'status': completed ? 1 : 0, 'text': description};
+```
+
+As the name suggest,
+these two simply convert a `JSON` object
+to a `Todo` class instance, 
+and vice-versa.
+
+Now we can start creating API requests!
+Firstly, install the [`http`](https://pub.dev/packages/http)
+package so we can make HTTP requests.
+
+```yaml
+http: ^0.13.5
+```
+
+And run `flutter pub get` to fetch this dependency.
+Add the following line to `android/app/src/debug/AndroidManifest.xml`
+to enable internet access in Android devices.
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+Now let us create a service
+to make API requests.
+Create a file inside `lib/repository/todoRepository.dart`
+and add the following code.
+
+```dart
+import 'dart:convert';
+
+import 'package:todo_app/todo.dart';
+import 'package:http/http.dart' as http;
+
+
+const baseUrl = 'http://YOUR_API_ADDRESS:4000/api';
+
+class TodoRepository {
+  static Future<List<Todo>> fetchTodoList() async {
+    final response = await http.get(Uri.parse('$baseUrl/items/'));
+
+    if (response.statusCode == 200) {
+      Iterable l = json.decode(response.body);
+      return List<Todo>.from(l.map((model) => Todo.fromJson(model)));
+    } else {
+      throw Exception('Failed to load Todo\'s.');
+    }
+  }
+
+  static Future<Todo> createTodo(String description) async {
+    final response = await http.post(Uri.parse('$baseUrl/items/'), body: {"text": description, "status": "0", "person_id": "0"});
+
+    if (response.statusCode == 200) {
+      return Todo.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to create Todo.');
+    }
+  }
+
+  static Future<Todo> updateTodoText(String id, String text) async {
+    final response = await http.put(Uri.parse('$baseUrl/items/$id'), body: {"text": text});
+
+    if (response.statusCode == 200) {
+      return Todo.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to update Todo text.');
+    }
+  }
+
+  static Future<Todo> updateTodoStatus(String id, bool completed) async {
+    final response = await http.put(Uri.parse('$baseUrl/items/$id/status'), body: {"status": completed == true ? "1" : "0"} );
+
+    if (response.statusCode == 200) {
+      return Todo.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to update Todo text.');
+    }
+  }
+}
+```
+
+Let's unpack what we've done here.
+To make API requests from an emulator
+or from a real device to a server running on `localhost`,
+there are a couple of things we ought to do.
+- if you are running on an **iOS emulator**, 
+instead of `localhost`, 
+you ought to access `127.0.0.1`.
+- if you are running on an **Android emulator**, 
+instead of `localhost`, 
+you ought to access `10.0.2.2`.
+- if you are running on a **real device**, 
+*make sure the computer running the server
+and the device are on the same network* 
+and use the `IPv4 address` 
+instead of `localhost`.
+
+Change the `baseUrl` variable
+according to the scenario 
+you're in and you should be able 
+to make requests.
+If you are stuck,
+try to follow this video - https://www.youtube.com/watch?v=cDYCWdkbJI4&ab_channel=PodCoder.
+If you are *still stuck*,
+[open an issue](https://github.com/dwyl/flutter-todo-list-tutorial/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)
+so we can help you!
+
+> If you are running our Phoenix server 
+and trying to make requests from a real device,
+you have to stop it and change `config/dev.exs`.
+>
+> Locate the line 
+`http: [ip: {127, 0, 0, 1}, port: 4000]`
+and change it to
+`http: [ip: {0, 0, 0, 0}, port: 4000]`.
+> 
+> This will make it so 
+the server is reachable from devices
+running in the same network.
+
+We have a function 
+for each action the user does:
+creating todo, editing text,
+toggling todo and listing todos.
+In each one, we use `http` 
+to make a HTTP request
+and serialize the response from the server.
+A `Todo` item (or list) is returned
+in case the request is successful.
+
+> Don't use `JsonDecode`
+inside the `Uri.parse(:body)`.
+It already encodes the object. 
+[You'd just encode it twice](https://stackoverflow.com/questions/63309132/why-is-my-post-request-not-working-in-flutter-for-my-api-only)
+and it wouldn't work.
+
+### 5.2 `Riverpod` changes
+
+Now that we have created a way 
+to fetch our data, 
+we now need to change our `Riverpod` providers.
+By fetching data from API,
+we have introduced the concept 
+of [asynchronicity](https://en.wikipedia.org/wiki/Asynchrony_(computer_programming),
+which our app is not capable of handling, currently.
+
+But let's fix that!
+However, before that, 
+let's refresh how our providers are being called.
+
+- Inside `main.dart`, 
+in `_HomeState`, this widget is looking at any change
+from the `filteredTodos` provider inside `providers.dart`.
+- `filteredTodos` provider changes 
+whenever `todoListProvider` provider changes.
+- `todoListProvider` provider returns a `TodoList` object,
+which the user can add and edit items within.
+
+Let's *bubble up* and start making changes
+to `TodoList`.
+
+### 5.2.1 `TodoList` `StateNotifier` class
+
+If we open `todo.dart`
+and check the `TodoList` class,
+we will notice the following lines of code.
+
+```dart
+class TodoList extends StateNotifier<List<Todo>> {
+  TodoList([List<Todo>? initialTodos]) : super(initialTodos ?? []);
+
+}
+```
+
+We are initializing an instance of this class
+with an empty array by default.
+We want automatically fetch the data on startup. 
+We are going to do this on the constructor, like so.
+
+```dart
+class TodoList extends StateNotifier<AsyncValue<List<Todo>>> {
+  TodoList() : super(const AsyncValue.loading()) {
+    fetchTodos();
+  }
+}
+```
+
+`TodoList` is now a `StateNotifier` 
+which now wraps a `List<Todo>` 
+with [`AsyncValue`](https://pub.dev/documentation/riverpod/latest/riverpod/AsyncValue-class.html).
+This is an utility for manipulating asynchronous data.
+With this, we are guaranteed that we are not going to forget
+to handle loading and error state of this async operation.
+We will see that it exposes utilities 
+that will convert an `AsyncValue` to a different object
+inside the widget (e.g. show the data, 
+or render a loading animation while loading
+or showing an error screen when an error occurs).
+
+In the previous snippet 
+we are assigning a loading state before `fetchTodos`.
+Speaking of which, we should implement that function.
+Below, add the function.
+
+```dart
+ Future<void> fetchTodos() async {
+    state = const AsyncValue.loading();
+    try {
+      final data = await TodoRepository.fetchTodoList();
+      state = AsyncValue.data(data);
+    } catch (err, stack) {
+      state = AsyncValue.error(err, stack);
+    }
+  }
+```
+
+This function is pretty simple.
+We set the state of `TodoList` to `AsyncValue.loading`
+while fetching the todos from the API.
+Whether the request is successful or not,
+the state is set accordingly with the data
+or an error.
+Do notice that the data/error 
+is set with `AsyncValue.data/error`. 
+The `TodoList` (`List<Todo>`) is wrapped
+with `AsyncValue` (as we have stated before).
+
+We can make this function easier to read though.
+We can convert it to the following.
+
+```dart
+  Future<void> fetchTodos() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      return await TodoRepository.fetchTodoList();
+    });
+  }
+```
+
+`AsyncValue.guard` is just syntactic sugar.
+It simplifies the `try/catch` so we don't have to repeat it
+throughout the application.
+
+Now let's change the other three functions
+(`add`, `toggle` and `edit`) 
+so it conforms to having `AsyncValue`.
+
+```dart
+  /// Adds `todo` item to list.
+  Future<void> add(String description) async {
+    state = await AsyncValue.guard(() async {
+      Todo returned_todo = await TodoRepository.createTodo(description);
+      return [...?state.value, returned_todo];
+    });
+  }
+
+  /// Toggles `todo` item between completed or not completed.
+  Future<void> toggle(Todo todo) async {
+    state = await AsyncValue.guard(() async {
+      Todo returned_todo = await TodoRepository.updateTodoStatus(todo.id, !todo.completed);
+
+      final newState = [...?state.value];
+      final todoToReplaceIndex = newState.indexWhere((todo) => todo.id == returned_todo.id);
+
+      if (todoToReplaceIndex != -1) {
+        newState[todoToReplaceIndex] = Todo(
+          id: returned_todo.id,
+          completed: returned_todo.completed,
+          description: returned_todo.description,
+        );
+      }
+
+      return newState;
+    });
+  }
+
+  /// Edits a `todo` item.
+  Future<void> edit({required String id, required String description}) async {
+    state = await AsyncValue.guard(() async {
+      Todo returned_todo = await TodoRepository.updateTodoText(id, description);
+
+      final newState = [...?state.value];
+      final todoToReplaceIndex = newState.indexWhere((todo) => todo.id == id);
+
+      if (todoToReplaceIndex != -1) {
+        newState[todoToReplaceIndex] = Todo(
+          id: returned_todo.id,
+          completed: returned_todo.completed,
+          description: returned_todo.description,
+        );
+      }
+
+      return newState;
+    });
+  }
+```
+
+In each function, we've just converted it
+so it uses the `AsyncValue.guard`
+and returns the data from the API, 
+whether it is fetching a list
+or updating an item.
+
+Notice that we still create a new array
+and assign it to the state, 
+instead of mutating it directly.
+For example, inside the `add()` function,
+inside the `AsyncValue.guard`, 
+we return:
+
+```dart
+return [...?state.value, returned_todo];
+```
+
+We are returning a new array.
+Also, don't be confused about `?state.value`.
+`state` is an `AsyncValue` that *wraps* `Todo<List>`.
+To access the list, we need to access the value.
+However, since this is now async, `value` might be `null`.
+Hence why we are using a **null-aware spread operator** (`...?`).
+You can also use `state.error` or `state.loading` 
+to check if there is an error
+or the state is loading.
+
+Your file should now look like the following.
+
+[`lib/todo.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/e32b6df3f60170554f32fec039e33520db67fc85/lib/todo.dart)
+
+### 5.2.2 Providers
+
+We need to make changes to our providers
+declared inside `providers.dart`.
+Don't worry, it's quite simple.
+Since `TodoList` class
+returns `AsyncValue<List<Todo>>`
+instead of `List<Todo>`,
+we ought to do the same for the providers.
+
+Open `providers.dart` 
+and locate the `final todoListProvider` variable.
+Let's change it to the following.
+
+```dart
+final todoListProvider = StateNotifierProvider<TodoList, AsyncValue<List<Todo>>>((ref) {
+  return TodoList();
+});
+```
+
+As we've stated before, 
+we are now returning `AsyncValue<List<Todo>>`.
+We now return a normal `TodoList` class instance.
+(remember that in the constructor of `TodoList`
+we call `fetchTodos()`).
+
+Let's change the `final uncompletedTodosCount` provider.
+Locate it and change the code.
+
+```dart
+final uncompletedTodosCount = Provider<int>((ref) {
+  final count = ref.watch(todoListProvider).value?.where((todo) => !todo.completed).length;
+  return count ?? 0;
+});
+```
+
+We check if the `AsyncValue` returned by `todoListProvider`
+is not null, using the ternary `?` operator - `value?`.
+We return the uncompleted todos count
+if `count` is not null. 
+If it is, we just return 0.
+
+On to the last one!
+Locate the `final filteredTodos` provider
+and change it.
+
+```dart
+final filteredTodos = Provider<List<Todo>>((ref) {
+  final filter = ref.watch(todoListFilter);
+  final todos = ref.watch(todoListProvider).valueOrNull;
+
+  if (todos != null) {
+    switch (filter) {
+      case TodoListFilter.completed:
+        return todos.where((todo) => todo.completed).toList();
+      case TodoListFilter.active:
+        return todos.where((todo) => !todo.completed).toList();
+      case TodoListFilter.all:
+        return todos;
+    }
+  } else {
+    return [];
+  }
+});
+```
+
+It's pretty much the same.
+We've only added a verification to check
+if the `todos` returned by the `todoListProvider`
+is null or not.
+We are using `AsyncValue.valueOrNull` 
+so it returns `null` if there is no data 
+(it's still loading or it errored).
+
+Your file should now look like the following.
+
+[`lib/providers.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/e32b6df3f60170554f32fec039e33520db67fc85/lib/providers.dart)
+
+And we are done here!
+We just basically made changes 
+wrapping the `List<Todo>` with `AsyncValue`
+and checked if the `AsyncValue.value` 
+is defined or undefined.
+
+> This is the simplest way 
+to have async operations
+*while retaining* the work we've done.
+>
+> We could have changed `AsyncNotifier`,
+however [it is still not yet properly documented](https://codewithandrea.com/articles/flutter-riverpod-async-notifier/
+https://github.com/rrousselGit/riverpod/issues/1767).
+> 
+> Using [`FutureProvider`](https://docs-v2.riverpod.dev/docs/providers/future_provider/)
+was also an option. 
+However it's only suitable for simple scenarios,
+which is not the case.
+
+
+## 5.3 Handling async inside widgets
+
+Currently, the `Home` widget 
+extends `HookConsumerWidget`,
+which is `Riverpod`'s wrapper of a
+**Stateless Consumer Widget** with hooks.
+
+However, now that the underlying data `TodoList`
+can change overtime,
+we need to convert this stateless widget
+to a **stateful widget**.
+
+For this, we change:
+
+```dart
+class Home extends HookConsumerWidget {
+  const Home({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+  }
+}
+```
+
+To:
+
+```dart
+class Home extends StatefulHookConsumerWidget {
+  const Home({super.key});
+
+  @override
+  ConsumerState<Home> createState() => _HomeState();
+}
+
+class _HomeState extends ConsumerState<Home> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+  }
+}
+```
+
+`StatefulHookConsumerWidget` is the *stateful equivalent* 
+of `HookConsumerWidget`.
+Since we are creating a stateful widget, 
+we need to create a state, as well - 
+`ConsumerState<Home>`.
+
+And that's it!
+We need to make some small changes
+to the `TodoItem` widget
+because we've changed the `toggle` function
+inside `TodoList` to receive a `Todo` class
+instead of just an `id`.
+
+Locate the `Checkbox` inside `TodoItem` widget,
+and change it to this.
+
+```dart
+leading: Checkbox(
+  value: todo.completed,
+  onChanged: (value) => ref.read(todoListProvider.notifier).toggle(todo),
+),
+```
+
+We are now passing the `todo` object
+instead of `todo.id`.
+
+The other thing we need to change
+is to only make a request to `edit` the todo
+**only if the text input value is different from the todo value**.
+In other words, only update the item
+if the text was effectively changed.
+For this, inside the same widget `TodoItem`,
+we change the `onFocusChange` to the following.
+
+```dart
+onFocusChange: (focused) {
+  if (focused) {
+    textEditingController.text = todo.description;
+  } else {
+    
+    // Only call for todo text change if a value is actually different
+    if (todo.description != textEditingController.text) {
+      // Commit changes only when the textfield is unfocused, for performance
+      ref.read(todoListProvider.notifier).edit(id: todo.id, description: textEditingController.text);
+    }
+  }
+},
+```
+
+Your file should now look like the following.
+
+[`lib/main.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/715a6d29b3794cc2c74e8137a4f4d1959c823afd/lib/main.dart)
+
+If you run the server on your computer
+and run the application, 
+it should look like so!
+
+![demo_without_refresh](https://user-images.githubusercontent.com/17494745/207852054-c86b238d-3683-41ad-8977-0c6128522740.gif)
+
+## 5.4 Showing loading animation while fetching todos
+
+We have previously used `AsyncValue` 
+but haven't used its utilities for the most important feature:
+giving user feedback that an API request is occurring. 
+We should show a loading animation
+while the app is fetching the items from the API.
+
+For this, 
+since we wrapped the `todoListProvider` return value with `AsyncValue`,
+we can use the `.when` function inside the widget
+to conditionally render according to its state: 
+has data, is loading or has error.
+
+Locate the `ListView` inside `Scaffold(body:)`
+inside the `_HomeState` widget and `build()` function,
+and wrap it with the following.
+
+```dart
+child: Scaffold(
+  body: todosProvider.when(
+      loading: () => const Center(child: Center(child: CircularProgressIndicator())),
+      error: (error, stack) => 
+      const Center(
+          child: Center(
+            child: Text('Could\'nt make API request. Make sure server is running.'),
+          )
+      ),
+      data: (_) => ListView (...)
+```
+
+We are now showing a `CircularProgressIndicator`
+every time `AsyncValue` is at a `loading` state.
+If there's an error, we show a `Text`.
+If the data fetch is successful, 
+we show the `ListView` containing the items, as normal.
+
+If you run the app now,
+you should see a loading animation on startup,
+like so.
+
+![demo_with_loading](https://user-images.githubusercontent.com/17494745/207854851-587ea2c6-8a5d-4778-a771-93195956c585.gif)
+
+## 5.5 Refreshing list of items
+
+As it stands, 
+the user has no way to refresh the list of todos.
+We can use the [`RefreshIndicator`](https://api.flutter.dev/flutter/material/RefreshIndicator-class.html)
+to fetch the list of todos from the API
+by swiping from above the mobile device.
+
+For this, inside `_HomeState` and `build()`,
+we need to wrap the `Scaffold`
+with a `RefreshIndicator`.
+We are also going to need access to `todoListProvider`
+so we can fetch the todos.
+For this, change the beginning of the `build()` function
+to look like so.
+
+```dart
+
+class _HomeState extends ConsumerState<Home> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> onRefresh() {
+    return ref.read(todoListProvider.notifier).fetchTodos();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final AsyncValue<List<Todo>> todosProvider = ref.watch(todoListProvider); // this is only used for the loading animation
+
+    final todos = ref.watch(filteredTodos);
+    final newTodoController = useTextEditingController();
+
+    return GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: RefreshIndicator(
+            onRefresh: onRefresh,
+            child: Scaffold(
+
+  ...
+```
+
+We have successfully wrapped the `Scaffold` 
+with a `RefreshIndicator`.
+Once the swipe movement is completed,
+`onRefresh()` is called.
+Inside this function, we simply fetch the todos!
+
+And that's a wrap!
+If you run the server and the application,
+you should be able to refresh the list of todos!
+
+![final](https://user-images.githubusercontent.com/17494745/207856411-a15b2e3d-944c-42ce-b61b-d69bd7af2b17.gif)
+
+
+# I need help! ❓
+If you have some feedback or have any question, 
+do not hesitate 
+and [open an issue](https://github.com/dwyl/flutter-todo-list-tutorial/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc)! 
+We are here to help and are happy for your contribution!
+
+
+
+
 
