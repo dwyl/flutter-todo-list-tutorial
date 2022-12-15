@@ -670,7 +670,7 @@ class Menu extends HookConsumerWidget {
 /// By retrieving the [Todo] through a provider instead of through its
 /// constructor, this allows [TodoItem] to be instantiated using the `const` keyword.
 ///
-/// This encapuslation ensures that when adding/removing/editing todos, 
+/// This encapsulation ensures that when adding/removing/editing todos, 
 /// only what the impacted widgets rebuilds, instead of the entire list of items.
 final _currentTodo = Provider<Todo>((ref) => throw UnimplementedError());
 
@@ -785,7 +785,7 @@ When it taps/focusing,
 the description becomes editable.
 
 They can edit by changing
-the text and then unfocussing 
+the text and then unfocusing 
 (e.g. tapping away from the `TodoItem` widget).
 
 ```dart
