@@ -1,12 +1,3 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,10 +9,10 @@ import 'package:todo_app/repository/todoRepository.dart';
 import 'package:todo_app/todo.dart';
 import 'package:uuid/uuid.dart';
 
-/// Mock repository 
+/// Mock repository
 class FakeRepository implements TodoRepository {
   @override
-  Client get client => Client();
+  Client client = Client();
 
   @override
   Future<List<Todo>> fetchTodoList() async {
@@ -46,18 +37,37 @@ class FakeRepository implements TodoRepository {
   }
 }
 
+class FakeRepositoryException implements TodoRepository {
+  @override
+  Client client = Client();
+
+  @override
+  Future<List<Todo>> fetchTodoList() async {
+    throw Exception();
+  }
+  
+  @override
+  Future<Todo> createTodo(String description) {
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<Todo> updateTodoStatus(String id, bool completed) {
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<Todo> updateTodoText(String id, String text) {
+    throw UnimplementedError();
+  }
+}
 
 void main() {
   final addTodoInput = find.byKey(addTodoKey);
   final homeComponent = find.byType(Home);
 
   testWidgets('Build correctly setup', (WidgetTester tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        repositoryProvider.overrideWith((ref) => FakeRepository())
-      ], 
-      child: const App())
-    );
+    await tester.pumpWidget(ProviderScope(overrides: [repositoryProvider.overrideWith((ref) => FakeRepository())], child: const App()));
 
     // The first frame is a loading state.
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -77,12 +87,7 @@ void main() {
   });
 
   testWidgets('Adds todo and renders newly created todo', (WidgetTester tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        repositoryProvider.overrideWith((ref) => FakeRepository())
-      ], 
-      child: const App())
-    );
+    await tester.pumpWidget(ProviderScope(overrides: [repositoryProvider.overrideWith((ref) => FakeRepository())], child: const App()));
 
     // Re-render to skip the loading animation
     await tester.pump();
@@ -115,16 +120,11 @@ void main() {
   });
 
   testWidgets('Editing a todo item', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        repositoryProvider.overrideWith((ref) => FakeRepository())
-      ], 
-      child: const App())
-    );
+    await tester.pumpWidget(ProviderScope(overrides: [repositoryProvider.overrideWith((ref) => FakeRepository())], child: const App()));
 
     // Re-render to skip the loading animation
     await tester.pump();
-    
+
     // Expect to find the default todo item
     expect(find.text('hey there :)'), findsOneWidget);
     final firstItem = find.byType(TodoItem);
@@ -150,12 +150,7 @@ void main() {
   });
 
   testWidgets('Marking todo item as done and checking it in the completed tab', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        repositoryProvider.overrideWith((ref) => FakeRepository())
-      ], 
-      child: const App())
-    );
+    await tester.pumpWidget(ProviderScope(overrides: [repositoryProvider.overrideWith((ref) => FakeRepository())], child: const App()));
 
     // Re-render to skip the loading animation
     await tester.pump();
@@ -209,5 +204,37 @@ void main() {
 
     expect(find.text('hey there :)'), findsOneWidget);
     await tester.tap(homeComponent);
+  });
+
+  testWidgets('Refresh should call fetchTodo function', (WidgetTester tester) async {
+    await tester.pumpWidget(ProviderScope(overrides: [repositoryProvider.overrideWith((ref) => FakeRepository())], child: const App()));
+
+    // Re-render to skip the loading animation
+    await tester.pump();
+
+    final firstItem = find.byType(TodoItem);
+    await tester.fling(firstItem, const Offset(0.0, 300.0), 1000.0);
+
+    expect(find.byType(RefreshProgressIndicator), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1)); // finish the scroll animation
+    await tester.pump(const Duration(seconds: 1)); // finish the indicator settle animation
+    await tester.pump(const Duration(seconds: 1)); // finish the indicator hide animation
+  });
+
+  testWidgets('Show error when API fails', (WidgetTester tester) async {
+    await tester.pumpWidget(ProviderScope(overrides: [repositoryProvider.overrideWith((ref) => FakeRepositoryException())], child: const App()));
+
+    // The first frame is a loading state.
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    // Re-render. TodoListProvider should have finished fetching the todos by now
+    await tester.pump();
+
+    // No longer loading
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+
+    // Find the error text
+    expect(find.text("Could\'nt make API request. Make sure server is running."), findsOneWidget);
   });
 }

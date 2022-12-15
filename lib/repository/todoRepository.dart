@@ -7,10 +7,10 @@ import 'package:http/http.dart' show Client;
 // Localhost android emulator - 10.0.2.2
 // Localhost real device or ios or android - IP address of network (device and computer have to be on the same network)
 // Make sure your server is running on "0.0.0.0:PORT" so it can be accessible through the IP network
-const baseUrl = 'http://192.168.1.201:4000/api';
+const baseUrl = 'http://192.XXX.X.XXX:4000/api';
 
 class TodoRepository {
-  final Client client = Client();
+  Client client = Client();
 
   Future<List<Todo>> fetchTodoList() async {
     final response = await client.get(Uri.parse('$baseUrl/items/'));

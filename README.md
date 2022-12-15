@@ -1052,14 +1052,11 @@ to the class.
   factory Todo.fromJson(Map<String, dynamic> json) {
     return Todo(id: json['id'].toString(), description: json['text'], completed: json['status'] == 0 ? false : true);
   }
-
-  Map<String, dynamic> toJson() => {'person_id': 0, 'status': completed ? 1 : 0, 'text': description};
 ```
 
 As the name suggest,
-these two simply convert a `JSON` object
-to a `Todo` class instance, 
-and vice-versa.
+`fromJson` simply converts a `JSON` object
+to a `Todo` class instance.
 
 Now we can start creating API requests!
 Firstly, install the [`http`](https://pub.dev/packages/http)
@@ -1088,10 +1085,10 @@ import 'dart:convert';
 import 'package:todo_app/todo.dart';
 import 'package:http/http.dart' show Client;
 
-const baseUrl = 'http://192.168.1.201:4000/api';
+const baseUrl = 'http://192.XXX.X.XXX:4000/api';
 
 class TodoRepository {
-  final Client client = Client();
+  Client client = Client();
 
   Future<List<Todo>> fetchTodoList() async {
     final response = await client.get(Uri.parse('$baseUrl/items/'));

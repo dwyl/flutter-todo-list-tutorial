@@ -22,8 +22,6 @@ class Todo {
   factory Todo.fromJson(Map<String, dynamic> json) {
     return Todo(id: json['id'].toString(), description: json['text'], completed: json['status'] == 0 ? false : true);
   }
-
-  Map<String, dynamic> toJson() => {'person_id': 0, 'status': completed ? 1 : 0, 'text': description};
 }
 
 /// An object that controls a list of [Todo].
