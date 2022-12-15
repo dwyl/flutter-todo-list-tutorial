@@ -1393,8 +1393,7 @@ or the state is loading.
 
 Your file should now look like the following.
 
-//CHANGEHERE
-[`lib/todo.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/e32b6df3f60170554f32fec039e33520db67fc85/lib/todo.dart)
+[`lib/todo.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/d5e94e169c0a892b86443f90b2d472ec678e4a37/lib/todo.dart)
 
 ### 5.2.2 Providers
 
@@ -1482,8 +1481,8 @@ so it returns `null` if there is no data
 (it's still loading or it errored).
 
 Your file should now look like the following.
-//CHANGEHERE
-[`lib/providers.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/e32b6df3f60170554f32fec039e33520db67fc85/lib/providers.dart)
+
+[`lib/providers.dart`](https://github.com/dwyl/flutter-todo-list-tutorial/blob/d5e94e169c0a892b86443f90b2d472ec678e4a37/lib/providers.dart)
 
 And we are done here!
 We just basically made changes 
